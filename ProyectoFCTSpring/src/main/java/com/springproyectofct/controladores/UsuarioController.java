@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.springproyectofct.DAO.UsuarioDAO;
 import com.springproyectofct.DAO.UsuarioDaoImpl;
+import com.springproyectofct.modelo.Invitacion;
 import com.springproyectofct.modelo.Publicacion;
 import com.springproyectofct.modelo.Usuario;
 import com.springproyectofct.seguridad.UsuarioValido;
@@ -65,17 +66,20 @@ public class UsuarioController {
 	public String enviarSolicitud(@PathVariable(name = "id", required = false) int id) {
 
 
-		usuarioLogeado =  usuario.findOne(loginCorrecto);
+		Usuario usuarioReceptor = usuario.findOne(id);
 		
-//		usuarioLogeado.añadirContacto();
-		 
-		usuario.update(usuarioLogeado);
+		Invitacion invitacion = new Invitacion();
 		
+		invitacion.setIdUsuarioEmisor(usuarioLogeado.getId());
 		
+		invitacion.setIdUsuarioReceptor(usuarioReceptor.getId());
 
-		return "home";
+		usuarioReceptor.añadirInvitacion(invitacion);
 		
+		usuario.update(usuarioReceptor);
 
+		return "redirect:/home";
+		
 	}
 	
 	

@@ -13,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.validation.constraints.Email;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.lang.NonNull;
 
 @Entity
@@ -35,6 +37,10 @@ public class Usuario {
 	@OneToMany(mappedBy = "usuario1", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Contacto> contactos = new ArrayList<>();
 
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(mappedBy = "usuarioSolicitud", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Invitacion> invitaciones = new ArrayList<>();
+	
 	@Email
 	private String email;
 
@@ -96,6 +102,16 @@ public class Usuario {
 	public void borrarPublicacion(Publicacion publicacion) {
 		publicaciones.remove(publicacion);
 		publicacion.setUsuario(null);
+	}
+	
+	public void añadirInvitacion(Invitacion invitacion) {
+		invitaciones.add(invitacion);
+		invitacion.setUsuarioSolicitud(this);
+	}
+	
+	public void borrarInvitacion(Invitacion invitacion) {
+		invitaciones.remove(invitacion);
+		invitacion.setUsuarioSolicitud(null);
 	}
 
 	public String getEmail() {
