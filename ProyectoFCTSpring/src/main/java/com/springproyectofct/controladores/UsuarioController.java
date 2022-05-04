@@ -3,6 +3,10 @@ package com.springproyectofct.controladores;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,11 +20,13 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.springproyectofct.DAO.UsuarioDAO;
 import com.springproyectofct.DAO.UsuarioDaoImpl;
+import com.springproyectofct.modelo.Contacto;
 import com.springproyectofct.modelo.Invitacion;
 import com.springproyectofct.modelo.Publicacion;
 import com.springproyectofct.modelo.Usuario;
 import com.springproyectofct.seguridad.UsuarioValido;
 import com.springproyectofct.util.ImagenUtil;
+import com.springproyectofct.util.InvitacionUtil;
 
 @Controller
 public class UsuarioController {
@@ -29,124 +35,192 @@ public class UsuarioController {
 	private Usuario usuarioLogeado = new Usuario();
 	private UsuarioValido usuarioValido = new UsuarioValido();
 	ImagenUtil imgUtil = new ImagenUtil();
+	InvitacionUtil invUtil = new InvitacionUtil();
+	InvitacionUtil invitacionUtil = new InvitacionUtil();
 	int loginCorrecto = 1;
 	MultipartFile imagen;
 	String ruta = "C:\\Users\\willt\\eclipse-workspace2\\ProyectoFCTSpring\\target\\classes\\static\\";
 	String fomartoFecha = "yyyy_MM_dd'T'HH.mm.ss.SSS";
+
 	
 	
-	
+	//hacer metodo de acceso a cualquier parte de la red social, comprobando que loginCorrecto no sea cero, como se hace abajo.
 	@PostMapping("/validarUsuario")
 	public String validarUsuario(@ModelAttribute("usuarioLogin") Usuario usuarioLogin, Model model) {
 
 		loginCorrecto = 1;
 
-		if ( (loginCorrecto = usuarioValido.validarUsuario(usuarioLogin)) != 0) {
-			
+		if ((loginCorrecto = usuarioValido.validarUsuario(usuarioLogin)) != 0) {
+
 			usuarioLogeado = usuario.findOne(loginCorrecto);
-			
+
 			return "redirect:/home";
 		}
 
 		return "redirect:/";
 
 	}
- 
-	@GetMapping("/usuario/list")
-	public String listado(Model model) {
 
+	@GetMapping("/usuario/contactos")
+	public String listadoContactos(Model model) {
+
+		
+		//Aqui habría que controlar las solicitudes que ya se han enviado, para no que no se puedan volver a enviar.
 		model.addAttribute("listaUsuarios", usuario.findAll());
 
 		model.addAttribute("id");
 
-		return "list";
+		return "contactos";
 	}
 	
+	
+	
+	@RequestMapping(value = "/aceptarContacto/{id}")
+	public String aceptarContacto(@ModelAttribute(name = "id") int id) {
+
+		Invitacion invitacion = invitacionUtil.buscarInvitacion(id, usuarioLogeado);
+		
+		Usuario usuarioEmisor = usuario.findOne(invitacion.getIdUsuarioEmisor());
+				
+		usuarioLogeado.borrarInvitacion(invitacion);
+		
+		usuarioLogeado.añadirContacto(new Contacto(usuarioLogeado,usuarioEmisor));
+		
+		usuarioEmisor.añadirContacto(new Contacto(usuarioEmisor,usuarioLogeado));
+		
+		usuario.update(usuarioEmisor);
+		
+		usuario.update(usuarioLogeado);
+
+		return "redirect:/usuario/invitaciones";
+
+	}
+	
+	
+	
+	@RequestMapping(value = "/rechazarContacto/{id}")
+	public String rechazarContacto(@ModelAttribute(name = "id") int id) {
+
+		
+		Invitacion invitacion = invitacionUtil.buscarInvitacion(id, usuarioLogeado);
+		
+		Usuario usuarioEmisor = usuario.findOne(invitacion.getIdUsuarioEmisor());
+		
+		usuarioLogeado.borrarInvitacion(invitacion);
+
+		usuario.update(usuarioEmisor);
+		
+		usuario.update(usuarioLogeado);
+
+		return "redirect:/usuario/invitaciones";
+
+	}
+	
+	
+
+	@GetMapping("/usuario/invitaciones")
+	public String listadoInvitaciones(Model model) {
+		
+				
+		model.addAttribute("listaInvitaciones", usuarioLogeado.getInvitaciones());
+
+		model.addAttribute("invitacion", new Invitacion());
+
+		return "invitaciones";
+	}
+
 	@RequestMapping(value = "/solicitud/{id}")
 	public String enviarSolicitud(@PathVariable(name = "id", required = false) int id) {
 
-
+		
+		if(invitacionUtil.comprobarDuplicidad(usuario.findOne(id), usuarioLogeado)) {
+			
+			return "redirect:/usuario/contactos";
+		
+		}
+		
 		Usuario usuarioReceptor = usuario.findOne(id);
-		
+
 		Invitacion invitacion = new Invitacion();
-		
+
 		invitacion.setIdUsuarioEmisor(usuarioLogeado.getId());
 		
+		invitacion.setNombreUsuarioEmisor(usuarioLogeado.getNombre());
+
 		invitacion.setIdUsuarioReceptor(usuarioReceptor.getId());
 
 		usuarioReceptor.añadirInvitacion(invitacion);
-		
+
 		usuario.update(usuarioReceptor);
 
 		return "redirect:/home";
-		
+
 	}
-	
-	
-	
+
 	@GetMapping("/home")
 	public String home(Model model) throws IllegalStateException, IOException {
-		
-		model.addAttribute("listaPublicaciones", usuario.findOne(2).getPublicaciones());
 
-		model.addAttribute("publicacion" , new Publicacion());
-				
-		return "home";
-	}
-	
-	
-	
-	
-	@PostMapping("/home/new")
-	public String home2(@RequestParam(name = "imagen", required = false) MultipartFile multipartFile, @RequestParam(name = "comentario", required = false) String comentario ) throws IllegalStateException, IOException {
-
+		List <Publicacion> publicaciones = new ArrayList<Publicacion>();
 		
-		if(!comentario.isEmpty()) {
+		for(Contacto contacto : usuarioLogeado.getContactos()) {
 			
-			Publicacion publicacion = new Publicacion();
-			publicacion.setComentario(comentario);
+			for(Publicacion publicacion : contacto.getUsuario2().getPublicaciones()) {
+				//ordenar publicaciones por fechas de crecion.
+				publicaciones.add(publicacion);
 			
-			if(multipartFile != null) {
-				publicacion.setImagen( "imagenes\\"
-						+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd'T'HH.mm.ss.SSS")).toString()
-						+ multipartFile.getOriginalFilename());
-				
-				imgUtil.guardarImagen(ruta + publicacion.getImagen(), multipartFile);
-				
-				
 			}
-			
-			publicacion.setFecha(LocalDateTime.now());
-			
-			usuarioLogeado =  usuario.findOne(loginCorrecto);
-			
-			usuarioLogeado.añadirPublicacion(publicacion);
-			 
-			usuario.update(usuarioLogeado);
-			
-			
 		}
 		
+		Collections.sort(publicaciones, new Publicacion());
+		
+		model.addAttribute("listaPublicaciones", publicaciones);
+
+		model.addAttribute("publicacion", new Publicacion());
+
+		return "home";
+	}
+
+	@PostMapping("/home/new")
+	public String home2(@RequestParam(name = "imagen", required = false) MultipartFile multipartFile,
+			@RequestParam(name = "comentario", required = false) String comentario)
+			throws IllegalStateException, IOException {
+
+		if (!comentario.isEmpty()) {
+
+			Publicacion publicacion = new Publicacion();
+			publicacion.setComentario(comentario);
+
+			if (multipartFile != null) {
+				publicacion.setImagen("imagenes\\" + LocalDateTime.now()
+						.format(DateTimeFormatter.ofPattern("yyyy_MM_dd'T'HH.mm.ss.SSS")).toString()
+						+ multipartFile.getOriginalFilename());
+
+				imgUtil.guardarImagen(ruta + publicacion.getImagen(), multipartFile);
+
+			}
+
+			publicacion.setFecha(LocalDateTime.now());
+
+			usuarioLogeado = usuario.findOne(loginCorrecto);
+
+			usuarioLogeado.añadirPublicacion(publicacion);
+
+			usuario.update(usuarioLogeado);
+
+		}
+
 		return "redirect:/home";
 	}
-	
-	
-	
+
 	@GetMapping("/")
 	public String login(Model model) {
 
 		model.addAttribute("usuarioLogin", new Usuario());
-//
-		model.addAttribute("loginCorrecto", loginCorrecto);
 
-//		model.addAttribute("imagen");
+		model.addAttribute("loginCorrecto", loginCorrecto);
 
 		return "login";
 	}
-	
-	
-	
-	
 
 	@GetMapping("/usuario/new")
 	public String nuevoUsuarioForm(Model model) {
@@ -155,16 +229,13 @@ public class UsuarioController {
 
 		return "form";
 	}
-	
-	
 
 	@PostMapping("/usuario/new/submit")
 	public String nuevoUsuarioSubmit(@ModelAttribute("usuarioForm") Usuario nuevoUsuario) {
 
 		usuario.create(nuevoUsuario);
 
-		return "redirect:/usuario/list";
+		return "redirect:/usuario/contactos";
 	}
-
 
 }

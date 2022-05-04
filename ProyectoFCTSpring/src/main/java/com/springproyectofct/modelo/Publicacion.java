@@ -1,17 +1,24 @@
 package com.springproyectofct.modelo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.lang.NonNull;
 
 @Entity
-public class Publicacion {
+public class Publicacion implements Comparator<Publicacion> {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -26,14 +33,15 @@ public class Publicacion {
 
 	@ManyToOne
 	private Usuario usuario;
+	
+//	el objeto comentario contendra: id, id de usuario que comenta, string con el comentario, y fecha
+//	@LazyCollection(LazyCollectionOption.FALSE)
+//	@OneToMany(mappedBy = "comentarios", cascade = CascadeType.ALL, orphanRemoval = true)
+//	private List<Comentario> comentarios = new ArrayList<>();
 
-	
-	
 	public Publicacion() {
 
 	}
-	
-	
 
 	public Publicacion(Usuario usuario, String comentario, String imagen, LocalDateTime fecha) {
 		super();
@@ -49,13 +57,12 @@ public class Publicacion {
 		this.Imagen = imagen;
 		this.usuario = usuario;
 	}
-	
+
 	public Publicacion(String comentario, Usuario usuario) {
 		super();
 		this.comentario = comentario;
 		this.usuario = usuario;
 	}
-	
 
 	public int getId() {
 		return id;
@@ -95,6 +102,22 @@ public class Publicacion {
 
 	public void setFecha(LocalDateTime fecha) {
 		this.fecha = fecha;
+	}
+
+	@Override
+	public int compare(Publicacion p1, Publicacion p2) {
+
+		if (p1.getFecha().isBefore(p2.getFecha())) {
+			
+			return 1;
+			
+		} else if (p2.getFecha().isBefore(p1.getFecha())) {
+
+			return -1;
+			
+		}
+
+		return 0;
 	}
 
 }

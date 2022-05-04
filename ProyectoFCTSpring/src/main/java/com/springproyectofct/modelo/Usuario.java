@@ -34,11 +34,12 @@ public class Usuario {
 	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
 	private List<Publicacion> publicaciones = new ArrayList<>();
 	
+	@LazyCollection(LazyCollectionOption.FALSE)
 	@OneToMany(mappedBy = "usuario1", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Contacto> contactos = new ArrayList<>();
 
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@OneToMany(mappedBy = "usuarioSolicitud", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "UsuarioSolicitud", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Invitacion> invitaciones = new ArrayList<>();
 	
 	@Email
@@ -78,6 +79,22 @@ public class Usuario {
 
 	public List<Publicacion> getPublicaciones() {
 		return publicaciones;
+	}
+
+	public List<Contacto> getContactos() {
+		return contactos;
+	}
+
+	public void setContactos(List<Contacto> contactos) {
+		this.contactos = contactos;
+	}
+
+	public List<Invitacion> getInvitaciones() {
+		return invitaciones;
+	}
+
+	public void setInvitaciones(List<Invitacion> invitaciones) {
+		this.invitaciones = invitaciones;
 	}
 
 	public void setPublicaciones(List<Publicacion> publicaciones) {

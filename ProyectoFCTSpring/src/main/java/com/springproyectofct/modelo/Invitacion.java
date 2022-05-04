@@ -14,15 +14,16 @@ public class Invitacion {
 	private int id;
 
 	@ManyToOne
-	private Usuario usuarioSolicitud;
+	private Usuario UsuarioSolicitud;
 
-	
-	private int idUsuarioReceptor;
+	private int IdUsuarioReceptor;
 
-	
-	private int idUsuarioEmisor;
+	private int IdUsuarioEmisor;
 
-	
+	private String NombreUsuarioEmisor;
+
+	private boolean resuelta;
+
 	public Invitacion() {
 
 	}
@@ -35,28 +36,44 @@ public class Invitacion {
 		this.id = id;
 	}
 
+	public String getNombreUsuarioEmisor() {
+		return NombreUsuarioEmisor;
+	}
+
+	public void setNombreUsuarioEmisor(String nombreUsuarioEmisor) {
+		NombreUsuarioEmisor = nombreUsuarioEmisor;
+	}
+
 	public Usuario getUsuarioSolicitud() {
-		return usuarioSolicitud;
+		return UsuarioSolicitud;
 	}
 
 	public void setUsuarioSolicitud(Usuario usuarioSolicitud) {
-		this.usuarioSolicitud = usuarioSolicitud;
+		this.UsuarioSolicitud = usuarioSolicitud;
 	}
 
 	public int getIdUsuarioReceptor() {
-		return idUsuarioReceptor;
+		return IdUsuarioReceptor;
 	}
 
 	public void setIdUsuarioReceptor(int idUsuarioReceptor) {
-		this.idUsuarioReceptor = idUsuarioReceptor;
+		this.IdUsuarioReceptor = idUsuarioReceptor;
 	}
 
 	public int getIdUsuarioEmisor() {
-		return idUsuarioEmisor;
+		return IdUsuarioEmisor;
 	}
 
 	public void setIdUsuarioEmisor(int idUsuarioEmisor) {
-		this.idUsuarioEmisor = idUsuarioEmisor;
+		this.IdUsuarioEmisor = idUsuarioEmisor;
+	}
+
+	public boolean isResuelta() {
+		return resuelta;
+	}
+
+	public void setResuelta(boolean resuelta) {
+		this.resuelta = resuelta;
 	}
 
 }
