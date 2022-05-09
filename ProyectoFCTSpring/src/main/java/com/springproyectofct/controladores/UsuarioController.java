@@ -5,7 +5,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Controller;
@@ -24,9 +23,11 @@ import com.springproyectofct.modelo.Contacto;
 import com.springproyectofct.modelo.Invitacion;
 import com.springproyectofct.modelo.Publicacion;
 import com.springproyectofct.modelo.Usuario;
+import com.springproyectofct.seguridad.AccesoValido;
 import com.springproyectofct.seguridad.UsuarioValido;
 import com.springproyectofct.util.ImagenUtil;
 import com.springproyectofct.util.InvitacionUtil;
+import com.springproyectofct.util.usuarioRepetidoUtil;
 
 @Controller
 public class UsuarioController {
@@ -34,17 +35,16 @@ public class UsuarioController {
 	private UsuarioDAO usuario = new UsuarioDaoImpl();
 	private Usuario usuarioLogeado = new Usuario();
 	private UsuarioValido usuarioValido = new UsuarioValido();
+	private AccesoValido AccesValid = new AccesoValido();
+	private usuarioRepetidoUtil usuRepUtil = new usuarioRepetidoUtil();
 	ImagenUtil imgUtil = new ImagenUtil();
-	InvitacionUtil invUtil = new InvitacionUtil();
 	InvitacionUtil invitacionUtil = new InvitacionUtil();
 	int loginCorrecto = 1;
+	boolean usuarioRepetido = false;
 	MultipartFile imagen;
 	String ruta = "C:\\Users\\willt\\eclipse-workspace2\\ProyectoFCTSpring\\target\\classes\\static\\";
-	String fomartoFecha = "yyyy_MM_dd'T'HH.mm.ss.SSS";
+	String fomartoFecha = "dd.MM'T'HH.mm";
 
-	
-	
-	//hacer metodo de acceso a cualquier parte de la red social, comprobando que loginCorrecto no sea cero, como se hace abajo.
 	@PostMapping("/validarUsuario")
 	public String validarUsuario(@ModelAttribute("usuarioLogin") Usuario usuarioLogin, Model model) {
 
@@ -64,120 +64,156 @@ public class UsuarioController {
 	@GetMapping("/usuario/contactos")
 	public String listadoContactos(Model model) {
 
-		
-		//Aqui habría que controlar las solicitudes que ya se han enviado, para no que no se puedan volver a enviar.
-		model.addAttribute("listaUsuarios", usuario.findAll());
+		if (AccesValid.AccesoValido(usuarioLogeado)) {
 
-		model.addAttribute("id");
+			List<Usuario> usuarios = new ArrayList<Usuario>();
 
-		return "contactos";
+			usuarios.addAll(usuario.findAll());
+
+			model.addAttribute("listaUsuarios", usuarios);
+
+			model.addAttribute("id");
+
+			return "contactos";
+
+		}
+
+		return "redirect:/";
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/aceptarContacto/{id}")
 	public String aceptarContacto(@ModelAttribute(name = "id") int id) {
 
-		Invitacion invitacion = invitacionUtil.buscarInvitacion(id, usuarioLogeado);
-		
-		Usuario usuarioEmisor = usuario.findOne(invitacion.getIdUsuarioEmisor());
-				
-		usuarioLogeado.borrarInvitacion(invitacion);
-		
-		usuarioLogeado.añadirContacto(new Contacto(usuarioLogeado,usuarioEmisor));
-		
-		usuarioEmisor.añadirContacto(new Contacto(usuarioEmisor,usuarioLogeado));
-		
-		usuario.update(usuarioEmisor);
-		
-		usuario.update(usuarioLogeado);
+		if (AccesValid.AccesoValido(usuarioLogeado)) {
 
-		return "redirect:/usuario/invitaciones";
+			Invitacion invitacion = invitacionUtil.buscarInvitacion(id, usuarioLogeado);
+
+			Usuario usuarioEmisor = usuario.findOne(invitacion.getIdUsuarioEmisor());
+
+			usuarioLogeado.borrarInvitacion(invitacion);
+
+			usuarioLogeado.añadirContacto(new Contacto(usuarioLogeado, usuarioEmisor));
+
+			usuarioEmisor.añadirContacto(new Contacto(usuarioEmisor, usuarioLogeado));
+
+			usuario.update(usuarioEmisor);
+
+			usuario.update(usuarioLogeado);
+
+			return "redirect:/usuario/invitaciones";
+
+		}
+
+		return "redirect:/";
 
 	}
-	
-	
-	
+
 	@RequestMapping(value = "/rechazarContacto/{id}")
 	public String rechazarContacto(@ModelAttribute(name = "id") int id) {
 
-		
-		Invitacion invitacion = invitacionUtil.buscarInvitacion(id, usuarioLogeado);
-		
-		Usuario usuarioEmisor = usuario.findOne(invitacion.getIdUsuarioEmisor());
-		
-		usuarioLogeado.borrarInvitacion(invitacion);
+		if (AccesValid.AccesoValido(usuarioLogeado)) {
 
-		usuario.update(usuarioEmisor);
-		
-		usuario.update(usuarioLogeado);
+			Invitacion invitacion = invitacionUtil.buscarInvitacion(id, usuarioLogeado);
 
-		return "redirect:/usuario/invitaciones";
+			Usuario usuarioEmisor = usuario.findOne(invitacion.getIdUsuarioEmisor());
+
+			usuarioLogeado.borrarInvitacion(invitacion);
+
+			usuario.update(usuarioEmisor);
+
+			usuario.update(usuarioLogeado);
+
+			return "redirect:/usuario/invitaciones";
+
+		}
+
+		return "redirect:/";
 
 	}
-	
-	
 
 	@GetMapping("/usuario/invitaciones")
 	public String listadoInvitaciones(Model model) {
-		
-				
-		model.addAttribute("listaInvitaciones", usuarioLogeado.getInvitaciones());
 
-		model.addAttribute("invitacion", new Invitacion());
+		if (AccesValid.AccesoValido(usuarioLogeado)) {
 
-		return "invitaciones";
+			model.addAttribute("listaInvitaciones", usuarioLogeado.getInvitaciones());
+
+			model.addAttribute("invitacion", new Invitacion());
+
+			return "invitaciones";
+
+		}
+
+		return "redirect:/";
+
 	}
 
 	@RequestMapping(value = "/solicitud/{id}")
 	public String enviarSolicitud(@PathVariable(name = "id", required = false) int id) {
 
-		
-		if(invitacionUtil.comprobarDuplicidad(usuario.findOne(id), usuarioLogeado)) {
-			
-			return "redirect:/usuario/contactos";
-		
+		if (AccesValid.AccesoValido(usuarioLogeado)) {
+
+			if (invitacionUtil.comprobarDuplicidad(usuario.findOne(id), usuarioLogeado)) {
+
+				return "redirect:/usuario/contactos";
+
+			}
+
+			Usuario usuarioReceptor = usuario.findOne(id);
+
+			Invitacion invitacion = new Invitacion();
+
+			invitacion.setIdUsuarioEmisor(usuarioLogeado.getId());
+
+			invitacion.setNombreUsuarioEmisor(usuarioLogeado.getNombre());
+
+			invitacion.setIdUsuarioReceptor(usuarioReceptor.getId());
+
+			usuarioReceptor.añadirInvitacion(invitacion);
+
+			usuario.update(usuarioReceptor);
+
+			return "redirect:/home";
+
 		}
-		
-		Usuario usuarioReceptor = usuario.findOne(id);
 
-		Invitacion invitacion = new Invitacion();
-
-		invitacion.setIdUsuarioEmisor(usuarioLogeado.getId());
-		
-		invitacion.setNombreUsuarioEmisor(usuarioLogeado.getNombre());
-
-		invitacion.setIdUsuarioReceptor(usuarioReceptor.getId());
-
-		usuarioReceptor.añadirInvitacion(invitacion);
-
-		usuario.update(usuarioReceptor);
-
-		return "redirect:/home";
+		return "redirect:/";
 
 	}
 
 	@GetMapping("/home")
 	public String home(Model model) throws IllegalStateException, IOException {
 
-		List <Publicacion> publicaciones = new ArrayList<Publicacion>();
-		
-		for(Contacto contacto : usuarioLogeado.getContactos()) {
-			
-			for(Publicacion publicacion : contacto.getUsuario2().getPublicaciones()) {
-				//ordenar publicaciones por fechas de crecion.
-				publicaciones.add(publicacion);
-			
+		if (AccesValid.AccesoValido(usuarioLogeado)) {
+
+			List<Publicacion> publicaciones = new ArrayList<Publicacion>();
+
+			List<Usuario> usuarios = new ArrayList<Usuario>();
+
+			for (Contacto contacto : usuarioLogeado.getContactos()) {
+
+				usuarios.add(contacto.getUsuario2());
+
+				publicaciones.addAll(contacto.getUsuario2().getPublicaciones());
+
 			}
+
+			publicaciones.addAll(usuarioLogeado.getPublicaciones());
+
+			Collections.sort(publicaciones, new Publicacion());
+
+			model.addAttribute("listaPublicaciones", publicaciones);
+
+			model.addAttribute("listaContactos", usuarios);
+
+			model.addAttribute("publicacion", new Publicacion());
+
+			return "home";
+
 		}
-		
-		Collections.sort(publicaciones, new Publicacion());
-		
-		model.addAttribute("listaPublicaciones", publicaciones);
 
-		model.addAttribute("publicacion", new Publicacion());
+		return "redirect:/";
 
-		return "home";
 	}
 
 	@PostMapping("/home/new")
@@ -185,31 +221,40 @@ public class UsuarioController {
 			@RequestParam(name = "comentario", required = false) String comentario)
 			throws IllegalStateException, IOException {
 
-		if (!comentario.isEmpty()) {
+		if (AccesValid.AccesoValido(usuarioLogeado)) {
 
-			Publicacion publicacion = new Publicacion();
-			publicacion.setComentario(comentario);
+			if (!comentario.isEmpty()) {
 
-			if (multipartFile != null) {
-				publicacion.setImagen("imagenes\\" + LocalDateTime.now()
-						.format(DateTimeFormatter.ofPattern("yyyy_MM_dd'T'HH.mm.ss.SSS")).toString()
-						+ multipartFile.getOriginalFilename());
+				Publicacion publicacion = new Publicacion();
+				publicacion.setComentario(comentario);
 
-				imgUtil.guardarImagen(ruta + publicacion.getImagen(), multipartFile);
+				if (multipartFile != null) {
+					publicacion
+							.setImagen("imagenes\\"
+									+ LocalDateTime.now()
+											.format(DateTimeFormatter.ofPattern("yyyy_MM_dd'T'HH.mm.ss.SSS")).toString()
+									+ multipartFile.getOriginalFilename());
+
+					imgUtil.guardarImagen(ruta + publicacion.getImagen(), multipartFile);
+
+				}
+
+				publicacion.setFecha(LocalDateTime.now());
+
+				usuarioLogeado = usuario.findOne(loginCorrecto);
+
+				usuarioLogeado.añadirPublicacion(publicacion);
+
+				usuario.update(usuarioLogeado);
 
 			}
 
-			publicacion.setFecha(LocalDateTime.now());
-
-			usuarioLogeado = usuario.findOne(loginCorrecto);
-
-			usuarioLogeado.añadirPublicacion(publicacion);
-
-			usuario.update(usuarioLogeado);
+			return "redirect:/home";
 
 		}
 
-		return "redirect:/home";
+		return "redirect:/";
+
 	}
 
 	@GetMapping("/")
@@ -227,15 +272,35 @@ public class UsuarioController {
 
 		model.addAttribute("usuarioForm", new Usuario());
 
+		model.addAttribute("usuarioRepetido", usuarioRepetido);
+
 		return "form";
 	}
 
 	@PostMapping("/usuario/new/submit")
-	public String nuevoUsuarioSubmit(@ModelAttribute("usuarioForm") Usuario nuevoUsuario) {
+	public String nuevoUsuarioSubmit(@RequestParam(name = "imagen", required = false) MultipartFile multipartFile,
+			@ModelAttribute("usuarioForm") Usuario nuevoUsuario) throws IllegalStateException, IOException {
+
+		usuarioRepetido = false;
+
+		if ((usuarioRepetido = usuRepUtil.usuarioRepetido(nuevoUsuario))) {
+
+			return "redirect:/usuario/new";
+		}
+
+		if (multipartFile != null) {
+
+			nuevoUsuario.setAvatar("avatares\\"
+					+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd'T'HH.mm.ss.SSS")).toString()
+					+ multipartFile.getOriginalFilename());
+
+			imgUtil.guardarImagen(ruta + nuevoUsuario.getAvatar(), multipartFile);
+
+		}
 
 		usuario.create(nuevoUsuario);
 
-		return "redirect:/usuario/contactos";
+		return "redirect:/";
 	}
 
 }

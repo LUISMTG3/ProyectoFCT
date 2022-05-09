@@ -15,9 +15,6 @@ public class ImagenUtil {
 
 		// creo un nuevo archivo
 		File file = new File(ruta);
-
-		System.out.println(ruta);
-		System.out.println(archivo.getOriginalFilename());
 		
 		
 		// transfiero el archivo multipart al disco.
@@ -25,18 +22,6 @@ public class ImagenUtil {
 
 	}
 	
-	
-	public static void mostrarImagen(String ruta) throws IllegalStateException, IOException {
 
-		// creo un nuevo archivo
-		File file = new File(ruta);
-
-		MultipartFile archivo;
-		
-		
-		// transfiero el archivo multipart al disco.
-//		archivo.transferTo(file);
-
-	}
 
 }

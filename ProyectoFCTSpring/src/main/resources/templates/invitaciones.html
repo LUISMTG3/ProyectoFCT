@@ -10,8 +10,65 @@
 
 <title>Starter Template for Bootstrap</title>
 
+<style>
+
+a {
+	color: #fff;
+	cursor: pointer;
+	display: block;
+	position: relative;
+	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+a:hover {
+	color: #000 !important;
+	background-color: transparent;
+	text-shadow: nthree;
+}
+
+a:before {
+	left: 0%;
+	right: auto;
+	width: 100%;
+}
+
+a:before {
+	display: block;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	height: 100%;
+	width: 0px;
+	z-index: -1;
+	content: '';
+	color: #000 !important;
+	background: #F7CA18;
+	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+a:after {
+	opacity: 0;
+	background-image: -webkit-linear-gradient(transparent 50%, rgba(101, 179, 122, 0.2)
+		50%);
+	background-image: -moz-linear-gradient(transparent 50%, rgba(101, 179, 122, 0.2)
+		50%);
+	background-size: 10px 10px;
+	-moz-transform: translateX(-50%) translateY(-50%) rotate(90deg);
+	-ms-transform: translateX(-50%) translateY(-50%) rotate(90deg);
+	-webkit-transform: translateX(-50%) translateY(-50%) rotate(90deg);
+	transform: translateX(-50%) translateY(-50%) rotate(90deg);
+}
+
+img {
+	border-radius: 50%;
+	size: 100%;
+}
+</style>
+
 <!-- Bootstrap core CSS -->
 <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link rel="shortcut icon" type="image/png"
+	href="/imagenes/flower_green.png" />
 
 <!-- Custom styles for this template -->
 <link href="/css/starter-template.css" rel="stylesheet">
@@ -38,7 +95,7 @@
 		</div>
 		<div id="navbar" class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
-				<li class="active"><a href="#">Inicio</a></li>
+				<li class="active"><a href="/home">Inicio</a></li>
 				<li class="active"><a href="/usuario/new">Nuevo Usuario</a></li>
 				<li class="active"><a href="/usuario/contactos">Contactos</a></li>
 				<li class="active"><a href="/usuario/invitaciones">Invitaciones</a></li>
@@ -52,16 +109,21 @@
 
 		<div class="lista">
 			<h1>Listado de peticiones</h1>
-			<form  method="post">
-			<table class="table">
-				<tbody>
-					<tr th:each="invitacion : ${listaInvitaciones}" >
-						<td th:text="'El usuario ' + ${invitacion.NombreUsuarioEmisor} + ' quiere agregarte como amigo.'"></td>
-						<td><a th:href="@{/aceptarContacto/{id}(id=${invitacion.id})}" class="btn btn-primary" type="submit">Aceptar solicitud</a></td>
-						<td><a th:href="@{/rechazarContacto/{id}(id=${invitacion.id})}" class="btn btn-primary" type="submit">Rechazar solicitud</a></td>
-					</tr>
-				</tbody>
-			</table>
+			<form method="post">
+				<table class="table">
+					<tbody>
+						<tr th:each="invitacion : ${listaInvitaciones}">
+							<td
+								th:text="'El usuario ' + ${invitacion.NombreUsuarioEmisor} + ' quiere agregarte como amigo.'"></td>
+							<td><a
+								th:href="@{/aceptarContacto/{id}(id=${invitacion.id})}"
+								class="btn btn-primary" type="submit">Aceptar solicitud</a></td>
+							<td><a
+								th:href="@{/rechazarContacto/{id}(id=${invitacion.id})}"
+								class="btn btn-primary" type="submit">Rechazar solicitud</a></td>
+						</tr>
+					</tbody>
+				</table>
 			</form>
 		</div>
 

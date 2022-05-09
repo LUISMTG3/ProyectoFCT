@@ -8,52 +8,120 @@
 <meta name="description" content="">
 <meta name="author" content="">
 <title>Iniciar</title>
-<style type="text/css">dialog::backdrop {
-  background: rgba(0,0,0,.6);
+<style type="text/css">
+
+
+a {
+	color: #fff;
+	cursor: pointer;
+	display: block;
+	position: relative;
+	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+a:hover {
+	color: #000 !important;
+	background-color: transparent;
+	text-shadow: nthree;
+}
+
+a:before {
+	left: 0%;
+	right: auto;
+	width: 100%;
+}
+
+a:before {
+	display: block;
+	position: absolute;
+	top: 0px;
+	right: 0px;
+	height: 100%;
+	width: 0px;
+	z-index: -1;
+	content: '';
+	color: #000 !important;
+	background: #F7CA18;
+	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
+}
+
+a:after {
+	opacity: 0;
+	background-image: -webkit-linear-gradient(transparent 50%, rgba(101, 179, 122, 0.2)
+		50%);
+	background-image: -moz-linear-gradient(transparent 50%, rgba(101, 179, 122, 0.2)
+		50%);
+	background-size: 10px 10px;
+	-moz-transform: translateX(-50%) translateY(-50%) rotate(90deg);
+	-ms-transform: translateX(-50%) translateY(-50%) rotate(90deg);
+	-webkit-transform: translateX(-50%) translateY(-50%) rotate(90deg);
+	transform: translateX(-50%) translateY(-50%) rotate(90deg);
+}
+
+body {
+	background-image: url('/imagenes/fondo_home.jpg');
+	background-repeat: no-repeat;
+	background-attachment: fixed;
+	background-size: cover;
+}
+
+div.container {
+	margin-top: 10%;
+	background-color: white;
+	width: 30%;
+	border-radius: 2%;
+	opacity: 0.9;
+	background-color: white;
+}
+
+dialog::backdrop {
+	background: rgba(0, 0, 0, .6);
 }
 
 #mostrar {
-  background-color: #232b79;
-  color: #ffffff;
-  color: #161616;
-  border: none;
-  padding: .7rem 1.4rem;
-  font-size: 1.5rem;
-  border-radius: 7px;
-  cursor: pointer;
+	background-color: #232b79;
+	color: #ffffff;
+	color: #161616;
+	border: none;
+	padding: .7rem 1.4rem;
+	font-size: 1.5rem;
+	border-radius: 7px;
+	cursor: pointer;
 }
 
 #mostrar:hover {
-  background-color: #232b79;
-  color: #ffffff;
-  transition: .2s ease-in;
+	background-color: #232b79;
+	color: #ffffff;
+	transition: .2s ease-in;
 }
 
 #mostrar {
-  color: #ffffff;
+	color: #ffffff;
 }
 
 #dialogo {
-  border: none;
-  border-radius: 5px;
-  text-align: center;
+	border: none;
+	border-radius: 5px;
+	text-align: center;
 }
 
 #cerrar {
-  background: #232b79;
-  color: #ffffff;
-  border: none;
-  border-radius: 5px;
-  padding: .4rem 1rem;
-  cursor: pointer;
-}</style>
+	background: #232b79;
+	color: #ffffff;
+	border: none;
+	border-radius: 5px;
+	padding: .4rem 1rem;
+	cursor: pointer;
+}
+</style>
 <!-- Bootstrap core CSS -->
 <link href="/webjars/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
 <!-- Custom styles for this template -->
 <link href="/css/starter-template.css" rel="stylesheet">
 
-<link rel="shortcut icon" type="image/png" href="/flower_green.png"/>
+<link rel="shortcut icon" type="image/png"
+	href="/imagenes/flower_green.png" />
 
 <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
 <!--[if lt IE 9]>-->
@@ -61,23 +129,14 @@
 <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 
 
-<!-- 
-<script> 
-          //Cuadro de diálogo de confirmación en JavaScript
-          function confirmarAccesoURL()
-          {
-	    return confirm("¿Está seguro que desea acceder a la web Proyecto MiRedSocial.com?");
-          }
-	</script> -->
-
 </head>
 
 <body>
 
 
+	<div>
 
-	<nav class="navbar navbar-inverse navbar-fixed-top">
-		<div class="container">
+		<nav class="navbar navbar-inverse navbar-fixed-top">
 			<div class="navbar-header">
 				<button type="button" class="navbar-toggle collapsed"
 					data-toggle="collapse" data-target="#navbar" aria-expanded="false"
@@ -90,84 +149,71 @@
 			</div>
 			<div id="navbar" class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
-					<li><a href="/">Inicio</a></li>
+					<li><a href="/home">Inicio</a></li>
 					<li class="active"><a href="/usuario/new">Nuevo Usuario</a></li>
 					<li class="active"><a href="/usuario/contactos">Contactos</a></li>
 					<li class="active"><a href="/usuario/invitaciones">Invitaciones</a></li>
 				</ul>
 			</div>
-		</div>
-	</nav>
-
-
-	
-
-
-	<form method="post" action="#" th:action="@{/validarUsuario}"
-		th:object="${usuarioLogin}">
-		<div class="mb-3">
-
-			<label for="nombre" class="nombre">Nombre de Usuario</label> <input
-				type="text" class="nombre" id="nombre" aria-describedby="emailHelp"
-				th:field="*{nombre}" required="required">
-
-		</div>
-
-		<div class="mb-3">
-
-			<label for="password" class="password">Password</label> 
-			<input type="password" class="form-control" id="password"
-				th:field="*{password}" required="required">
-
-		</div>
-
-		<button type="submit" class="btn btn-primary">Submit</button>
-	</form>
-
-
-	<div th:if="${loginCorrecto == 0}">
-		<h1>Usuario incorrecto</h1>
+		</nav>
 	</div>
 
- 
-<!--
-	<p />
-	<p />
-	<form action="#" th:action="@{/usuario/new/submit}" method="post"
-		th:object="${imagen}" enctype="multipart/form-data">
+	<div class="fondo">
+
+		<div class="container">
+
+			<div class="starter-template">
+
+				<div class="row">
+					<div class="col-md-offset-2 col-md-8">
+
+						<h1>MiRedSocial.com</h1>
+
+						<form method="post" action="#" th:action="@{/validarUsuario}"
+							th:object="${usuarioLogin}">
 
 
-		<label for="imagen" class="imagen">Elija imagen:</label> <input
-			id="imagen" name="imagen" type="file" th:object="${imagen}" />
+							<div class="form-group">
+								<label for="nombre" class="nombre">Nombre de Usuario</label> <input
+									type="text" class="form-control" id="nombre"
+									aria-describedby="emailHelp" th:field="*{nombre}"
+									required="required">
+
+							</div>
+
+							<div class="form-group">
+
+								<label for="password" class="password">Password</label> <input
+									type="password" class="form-control" id="password"
+									th:field="*{password}" required="required">
+
+							</div>
+
+							<button type="submit" class="btn btn-primary">Entrar</button>
+						</form>
+
+					</div>
+
+				</div>
+			</div>
+
+		</div>
 
 
-		<p />
-		<p />
-		<button type="submit" value="imagen">Enviar imagen</button>
-	</form>
+		<div class="mensajeError">
+			<div class="col-md-offset-2 col-md-8">
+				<div th:if="${loginCorrecto == 0}" class="form-group">
+					<h1>Usuario incorrecto</h1>
+				</div>
+			</div>
+		</div>
+		<!-- Bootstrap core JavaScript-->
+		<!--================================================== -->
+		<!-- Placed at the end of the document so the pages load faster -->
+		<script src="/webjars/jquery/jquery.min.js"></script>
+		<script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
 
-	<p />
-
-
-
-
-
-	<section>
-		<span onclick="alert('hola mundo!');">Clic aqu&iacute;</span>
-	</section>
-
-
-
-	-->
-
-
-
-	<!-- Bootstrap core JavaScript-->
-	<!--================================================== -->
-	<!-- Placed at the end of the document so the pages load faster -->
-	<script src="/webjars/jquery/jquery.min.js"></script>
-	<script src="/webjars/bootstrap/js/bootstrap.min.js"></script>
-
+	</div>
 </body>
 </html>
 

@@ -68,8 +68,6 @@ public class UsuarioDaoImpl implements UsuarioDAO {
 			em.getTransaction().begin();
 
 			em.persist(usuario);
-
-			System.out.println(usuario.getId());
 			
 			email.enviarConGMail(
 					usuario.getEmail(),

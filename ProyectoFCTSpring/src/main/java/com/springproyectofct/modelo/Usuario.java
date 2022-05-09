@@ -44,22 +44,25 @@ public class Usuario {
 	
 	@Email
 	private String email;
-
-	private String telefono;
+	
+	private String avatar;
 
 	public Usuario() {
 	}
 
+	public Usuario(String nombre, String contraseña, String avatar) {
+		super();
+		this.nombre = nombre;
+		this.password = contraseña;
+		this.avatar = avatar;
+	}
+	
 	public Usuario(String nombre, String contraseña) {
+		super();
 		this.nombre = nombre;
 		this.password = contraseña;
 	}
 
-	public Usuario(String nombre, String email, String telefono) {
-		this.nombre = nombre;
-		this.email = email;
-		this.telefono = telefono;
-	}
 
 	public int getId() {
 		return id;
@@ -139,17 +142,17 @@ public class Usuario {
 		this.email = email;
 	}
 
-	public String getTelefono() {
-		return telefono;
-	}
-
-	public void setTelefono(String telefono) {
-		this.telefono = telefono;
-	}
-
 	@Override
 	public String toString() {
-		return "Usuario [id=" + id + ", nombre=" + nombre + ", email=" + email + ", telefono=" + telefono + "]";
+		return "Usuario [id=" + id + ", nombre=" + nombre + ", email=" + email + ", telefono=" + "]";
+	}
+
+	public String getAvatar() {
+		return avatar;
+	}
+
+	public void setAvatar(String avatar) {
+		this.avatar = avatar;
 	}
 
 	public String getPassword() {
