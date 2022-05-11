@@ -10,8 +10,6 @@
 
 <title>Starter Template for Bootstrap</title>
 <style type="text/css">
-
-
 a {
 	color: #fff;
 	cursor: pointer;
@@ -59,9 +57,44 @@ a:after {
 	transform: translateX(-50%) translateY(-50%) rotate(90deg);
 }
 
-img {
+#contactos {
+	width: 20%;
+	margin-top: 5%;
+	margin-left: 8%;
+	position: absolute;
+}
+
+#publicaciones {
+	width: 70%;
+	align-content: right;
+	margin-top: 5%;
+	padding-right: 20%;
+	position: absolute;
+}
+
+#mostrar {
+	margin-left: 75%;
+	margin-top: 3%;
+	width: 20%;
+}
+
+#avatar {
+	width: 90px;
+	height: 90px;
 	border-radius: 50%;
+	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+}
+
+
+
+#fotos {
 	size: 100%;
+	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+}
+
+#texto1 {
+	padding-top: 45px;
+	padding-right: 10px;
 }
 
 dialog::backdrop {
@@ -72,6 +105,8 @@ dialog::backdrop {
 	border: none;
 	border-radius: 5px;
 	text-align: center;
+	border: none;
+	border: none;
 }
 
 #cerrar {
@@ -85,7 +120,14 @@ dialog::backdrop {
 </style>
 
 
-
+<!-- #fotos:hover {
+	-webkit-transform: scale(3);
+	-moz-transform: scale(3);
+	-ms-transform: scale(3);
+	-o-transform: scale(3);
+	transform: scale(3);
+}
+ -->
 
 
 <!-- Bootstrap core CSS -->
@@ -129,37 +171,35 @@ dialog::backdrop {
 	</nav>
 
 
-	<div class="container">
-
-		<div class="lista">
-			<h1>Tus contactos</h1>
-			<table class="table">
-				<tbody>
-					<tr th:each="contacto : ${listaContactos}">
-						<td th:text="${contacto.nombre}"></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+	<div id="contactos" class="col-md-offset-1 col-md-4">
+		<h1>Tus contactos</h1>
+		<table class="table">
+			<tbody>
+				<tr th:each="contacto : ${listaContactos}">
+					<td><img id="avatar" th:src="${contacto.getAvatar()}"></td>
+					<td id="texto1" th:text="${contacto.nombre}"></td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 
 
-	<div class="container">
 
-		<div class="lista">
-			<h1>Publicaciones</h1>
-			<table class="table">
-				<tbody>
-					<tr th:each="publicacion : ${listaPublicaciones}">
-						<td th:text="${publicacion.comentario}"></td>
-						<td><img th:src="${publicacion.imagen}" width="100"
-							height="100"></td>
-						<td
-							th:text="${#temporals.format(publicacion.fecha, 'dd-MM-yyyy HH:mm')}"></td>
-					</tr>
-				</tbody>
-			</table>
-		</div>
+	<div id="publicaciones" class="col-md-offset-4 col-md-7">
+		<h1>Publicaciones</h1>
+		<table class="table">
+
+			<tbody>
+				<tr th:each="publicacion : ${listaPublicaciones}">
+					<td th:text="${publicacion.comentario}"></td>
+					<td><img id="fotos"  th:src="${publicacion.imagen}" width="100"
+						height="100" onclick="javascript:this.width=450;this.height=338"
+							ondblclick="javascript:this.width=50;this.height=115" ></td>
+					<td
+						th:text="${#temporals.format(publicacion.fecha, 'dd-MM-yyyy HH:mm')}"></td>
+				</tr>
+			</tbody>
+		</table>
 	</div>
 
 	<p />
@@ -168,48 +208,45 @@ dialog::backdrop {
 
 
 
+
 		<button id="mostrar" onclick="mostrar" class="btn btn-primary">Añadir
 			estado</button>
 
 
-	</div>
 
-	<div class="container">
 		<dialog id="dialogo" class="dialogo-estilo">
-		<div class="container">
 
-			<div class="starter-template">
-				<h1>Nuevo estado</h1>
-				<div class="row">
-					<div class="col-md-offset-2 col-md-8">
+		<div class="starter-template">
+			<h1>Nuevo estado</h1>
+			<div class="row">
+				<div class="col-md-offset-2 col-md-8">
 
-						<form method="post" action="#" th:action="@{/home/new}"
-							enctype="multipart/form-data">
+					<form method="post" action="#" th:action="@{/home/new}"
+						enctype="multipart/form-data">
 
-							<div class="form-group">
+						<div class="form-group">
 
-								<label for="comentario"></label> <input type="text"
-									class="comentario" id="comentario" name="comentario"
-									placeholder="¿Que está pasando?" th:object="${comentario}"
-									required="required" />
+							<label for="comentario"></label> <input type="text"
+								class="comentario" id="comentario" name="comentario"
+								placeholder="¿Que está pasando?" th:object="${comentario}"
+								required="required" />
 
-							</div>
+						</div>
 
-							<div>
+						<div>
 
-								<label for="imagen" class="imagen">Subir imagen:</label> <input
-									id="imagen" name="imagen" type="file" th:object="${imagen}" />
+							<label for="imagen" class="imagen">Subir imagen:</label> <input
+								id="imagen" name="imagen" type="file" th:object="${imagen}" />
 
-							</div>
+						</div>
 
 
-							<button type="submit" class="enviar">Enviar</button>
+						<button type="submit" class="enviar">Enviar</button>
 
-						</form>
-
-					</div>
+					</form>
 
 				</div>
+
 			</div>
 
 		</div>

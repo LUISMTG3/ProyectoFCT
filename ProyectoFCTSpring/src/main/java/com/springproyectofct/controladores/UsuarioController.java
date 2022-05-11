@@ -190,23 +190,27 @@ public class UsuarioController {
 
 			List<Usuario> usuarios = new ArrayList<Usuario>();
 
+			List<String> avatares = new ArrayList<String>();
+			
 			for (Contacto contacto : usuarioLogeado.getContactos()) {
 
 				usuarios.add(contacto.getUsuario2());
-
 				publicaciones.addAll(contacto.getUsuario2().getPublicaciones());
-
+				avatares.add(contacto.getUsuario2().getAvatar());
+				
 			}
 
 			publicaciones.addAll(usuarioLogeado.getPublicaciones());
 
 			Collections.sort(publicaciones, new Publicacion());
-
+			
 			model.addAttribute("listaPublicaciones", publicaciones);
 
 			model.addAttribute("listaContactos", usuarios);
 
 			model.addAttribute("publicacion", new Publicacion());
+			
+//			model.addAttribute("avatares",avatares);
 
 			return "home";
 
