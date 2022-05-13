@@ -1,6 +1,7 @@
 package com.springproyectofct.controladores;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -41,6 +42,8 @@ public class UsuarioController {
 	InvitacionUtil invitacionUtil = new InvitacionUtil();
 	int loginCorrecto = 1;
 	boolean usuarioRepetido = false;
+	int numeroPublicaciones = 0;
+	int ultimaPublicacion = 9;
 	MultipartFile imagen;
 	String ruta = "C:\\Users\\willt\\eclipse-workspace2\\ProyectoFCTSpring\\target\\classes\\static\\";
 	String fomartoFecha = "dd.MM'T'HH.mm";
@@ -191,32 +194,46 @@ public class UsuarioController {
 			List<Usuario> usuarios = new ArrayList<Usuario>();
 
 			List<String> avatares = new ArrayList<String>();
-			
+
 			for (Contacto contacto : usuarioLogeado.getContactos()) {
 
 				usuarios.add(contacto.getUsuario2());
 				publicaciones.addAll(contacto.getUsuario2().getPublicaciones());
 				avatares.add(contacto.getUsuario2().getAvatar());
-				
+
 			}
 
 			publicaciones.addAll(usuarioLogeado.getPublicaciones());
 
 			Collections.sort(publicaciones, new Publicacion());
+
+			if((ultimaPublicacion += numeroPublicaciones)< (publicaciones.size() - 1)) {
+				publicaciones.subList(ultimaPublicacion, publicaciones.size()).clear();
+			}
 			
+
 			model.addAttribute("listaPublicaciones", publicaciones);
 
 			model.addAttribute("listaContactos", usuarios);
 
+			model.addAttribute("numeroPublicaciones", numeroPublicaciones);
+
 			model.addAttribute("publicacion", new Publicacion());
-			
-//			model.addAttribute("avatares",avatares);
 
 			return "home";
 
 		}
 
 		return "redirect:/";
+
+	}
+
+	@RequestMapping(value = "/home/{numeroPublicaciones}")
+	public String verMas(@PathVariable(name = "numeroPublicaciones", required = true) int numeroPublicaciones) {
+
+		this.numeroPublicaciones += numeroPublicaciones;
+
+		return "redirect:/home";
 
 	}
 
@@ -232,7 +249,7 @@ public class UsuarioController {
 				Publicacion publicacion = new Publicacion();
 				publicacion.setComentario(comentario);
 
-				if (multipartFile != null) {
+				if (!multipartFile.isEmpty()) {
 					publicacion
 							.setImagen("imagenes\\"
 									+ LocalDateTime.now()
@@ -241,6 +258,8 @@ public class UsuarioController {
 
 					imgUtil.guardarImagen(ruta + publicacion.getImagen(), multipartFile);
 
+				}else {
+					publicacion.setImagen(null);
 				}
 
 				publicacion.setFecha(LocalDateTime.now());

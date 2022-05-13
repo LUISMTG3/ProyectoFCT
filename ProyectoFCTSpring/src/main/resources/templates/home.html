@@ -64,6 +64,16 @@ a:after {
 	position: absolute;
 }
 
+#publicacion {
+	height: 300px;
+}
+
+#textoPublicacion {
+	padding-top: 1%;
+	padding-left: 10%;
+	width: 600px;
+}
+
 #publicaciones {
 	width: 70%;
 	align-content: right;
@@ -85,11 +95,24 @@ a:after {
 	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
 }
 
+#avatar2 {
+	size: 100%;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+}
 
+#nombre {
+	width: 20px;
+	padding-top: 2.5%;
+}
 
 #fotos {
 	size: 100%;
 	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+	margin-top: 10%;
+	align-content: left;
 }
 
 #texto1 {
@@ -188,14 +211,18 @@ dialog::backdrop {
 	<div id="publicaciones" class="col-md-offset-4 col-md-7">
 		<h1>Publicaciones</h1>
 		<table class="table">
-
 			<tbody>
-				<tr th:each="publicacion : ${listaPublicaciones}">
-					<td th:text="${publicacion.comentario}"></td>
-					<td><img id="fotos"  th:src="${publicacion.imagen}" width="100"
-						height="100" onclick="javascript:this.width=450;this.height=338"
-							ondblclick="javascript:this.width=50;this.height=115" ></td>
-					<td
+				<tr id="publicacion" th:each="publicacion : ${listaPublicaciones}">
+					<td th:if="${publicacion.imagen != null}"><img id="avatar2"
+						th:src="${publicacion.getUsuario().getAvatar()}"></td>
+					<td id="nombre" th:text="${publicacion.getUsuario().getNombre()}"></td>
+					<td id="textoPublicacion" th:text="${publicacion.comentario}"></td>
+					<td th:if="${publicacion.imagen != null}"><img id="fotos"
+						th:src="${publicacion.imagen}" width="450" height="338"
+						onclick="javascript:this.width=800;this.height=650"
+						ondblclick="javascript:this.width=450;this.height=338"></td>
+					<td th:if="${publicacion.imagen == null}"></td>
+					<td id="fechaPublicacion"
 						th:text="${#temporals.format(publicacion.fecha, 'dd-MM-yyyy HH:mm')}"></td>
 				</tr>
 			</tbody>
@@ -205,9 +232,6 @@ dialog::backdrop {
 	<p />
 
 	<div class="container">
-
-
-
 
 		<button id="mostrar" onclick="mostrar" class="btn btn-primary">Añadir
 			estado</button>
@@ -257,6 +281,9 @@ dialog::backdrop {
 	</div>
 
 
+	<a id="boton"
+		th:href="@{/home/{numeroPublicaciones}(numeroPublicaciones=${10})}"
+		class="btn btn-primary" type="submit">Mas...</a>
 
 
 
