@@ -8,6 +8,7 @@
 		<class>com.springproyectofct.modelo.Publicacion</class>
 		<class>com.springproyectofct.modelo.Contacto</class>
 		<class>com.springproyectofct.modelo.Invitacion</class>
+		<class>com.springproyectofct.modelo.Comentario</class>
 
 		<properties>
 			<property name="javax.persistence.jdbc.url"

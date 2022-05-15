@@ -1,15 +1,21 @@
 package com.springproyectofct.modelo;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 import org.springframework.lang.NonNull;
 
 @Entity
@@ -21,7 +27,7 @@ public class Publicacion implements Comparator<Publicacion> {
 
 	@NonNull
 	@Column(length = 10000)
-	private String comentario;
+	private String titulo;
 
 	private String Imagen;
 
@@ -30,10 +36,10 @@ public class Publicacion implements Comparator<Publicacion> {
 	@ManyToOne
 	private Usuario usuario;
 	
-//	el objeto comentario contendra: id, id de usuario que comenta, string con el comentario, y fecha
-//	@LazyCollection(LazyCollectionOption.FALSE)
-//	@OneToMany(mappedBy = "comentarios", cascade = CascadeType.ALL, orphanRemoval = true)
-//	private List<Comentario> comentarios = new ArrayList<>();
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(mappedBy = "publicacion", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Comentario> comentarios = new ArrayList<>();
+	
 
 	public Publicacion() {
 
@@ -42,22 +48,32 @@ public class Publicacion implements Comparator<Publicacion> {
 	public Publicacion(Usuario usuario, String comentario, String imagen, LocalDateTime fecha) {
 		super();
 		this.usuario = usuario;
-		this.comentario = comentario;
+		this.titulo = comentario;
 		this.Imagen = imagen;
 		this.fecha = fecha;
 	}
 
-	public Publicacion(String comentario, String imagen, Usuario usuario) {
+	public Publicacion(String titulo, String imagen, Usuario usuario) {
 		super();
-		this.comentario = comentario;
+		this.titulo = titulo;
 		this.Imagen = imagen;
 		this.usuario = usuario;
 	}
 
-	public Publicacion(String comentario, Usuario usuario) {
+	public Publicacion(String titulo, Usuario usuario) {
 		super();
-		this.comentario = comentario;
+		this.titulo = titulo;
 		this.usuario = usuario;
+	}
+	
+	public void añadirComentario(Comentario comentario) {
+		comentarios.add(comentario);
+		comentario.setPublicacion(this);
+	}
+	
+	public void eliminarComentario(Comentario comentario) {
+		comentarios.remove(comentario);
+		comentario.setPublicacion(null);
 	}
 
 	public int getId() {
@@ -76,12 +92,20 @@ public class Publicacion implements Comparator<Publicacion> {
 		this.usuario = usuario;
 	}
 
-	public String getComentario() {
-		return comentario;
+	public String getTitulo() {
+		return titulo;
 	}
 
-	public void setComentario(String comentario) {
-		this.comentario = comentario;
+	public void setTitulo(String titulo) {
+		this.titulo = titulo;
+	}
+
+	public List<Comentario> getComentarios() {
+		return comentarios;
+	}
+
+	public void setComentarios(List<Comentario> comentarios) {
+		this.comentarios = comentarios;
 	}
 
 	public String getImagen() {
@@ -114,6 +138,18 @@ public class Publicacion implements Comparator<Publicacion> {
 		}
 
 		return 0;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+
+		Publicacion publicacion = (Publicacion) obj;
+
+		if (this.getId() == publicacion.getId() ) {
+			return true;
+		}
+
+		return false;
 	}
 
 }

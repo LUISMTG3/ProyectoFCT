@@ -69,9 +69,7 @@ a:after {
 }
 
 #textoPublicacion {
-	padding-top: 1%;
-	padding-left: 10%;
-	width: 600px;
+	width: 700px;
 }
 
 #publicaciones {
@@ -103,15 +101,26 @@ a:after {
 	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
 }
 
+#fechaPublicacion {
+	padding-top: 2%;
+	padding-left: 70%;
+}
+
+hr {
+	border: 0;
+	border-top: 1px solid #999;
+	border-bottom: 1px solid #333;
+	height: 0;
+}
+
 #nombre {
-	width: 20px;
-	padding-top: 2.5%;
+	margin-left: 10px;
 }
 
 #fotos {
 	size: 100%;
 	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
-	margin-top: 10%;
+	margin-top: 3.5%;
 	align-content: left;
 }
 
@@ -210,20 +219,66 @@ dialog::backdrop {
 
 	<div id="publicaciones" class="col-md-offset-4 col-md-7">
 		<h1>Publicaciones</h1>
-		<table class="table">
+		<table th:each="publicacion : ${listaPublicaciones}">
 			<tbody>
-				<tr id="publicacion" th:each="publicacion : ${listaPublicaciones}">
-					<td th:if="${publicacion.imagen != null}"><img id="avatar2"
-						th:src="${publicacion.getUsuario().getAvatar()}"></td>
-					<td id="nombre" th:text="${publicacion.getUsuario().getNombre()}"></td>
-					<td id="textoPublicacion" th:text="${publicacion.comentario}"></td>
-					<td th:if="${publicacion.imagen != null}"><img id="fotos"
-						th:src="${publicacion.imagen}" width="450" height="338"
-						onclick="javascript:this.width=800;this.height=650"
+				<hr />
+				<tr>
+					<td><img id="avatar2"
+						th:src="${publicacion.getUsuario().getAvatar()}"><span
+						id="nombre" th:text="${publicacion.getUsuario().getNombre()}"></span></td>
+
+				</tr>
+				<tr>
+					<td><br> <br></td>
+				</tr>
+				<tr>
+					<td id="textoPublicacion" th:text="${publicacion.titulo}"></td>
+				</tr>
+				<tr th:if="${publicacion.imagen != null}">
+					<td><img id="fotos" th:src="${publicacion.imagen}" width="450"
+						height="338" onclick="javascript:this.width=800;this.height=650"
 						ondblclick="javascript:this.width=450;this.height=338"></td>
-					<td th:if="${publicacion.imagen == null}"></td>
-					<td id="fechaPublicacion"
-						th:text="${#temporals.format(publicacion.fecha, 'dd-MM-yyyy HH:mm')}"></td>
+				</tr>
+				<tr th:if="${publicacion.imagen == null}">
+					<td></td>
+				</tr>
+				<tr>
+					<td><a id="mostrarComentarios">Comentarios</a> <span
+						id="fechaPublicacion"
+						th:text="${#temporals.format(publicacion.fecha, 'dd-MM-yyyy HH:mm')}"></span>
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<form th:action="@{/home/new/coment/{idPublicacion}(idPublicacion=${publicacion.id})}">
+						
+							<div class="form-group">
+								<input type="text" class="form-control" id="comentario" name="comentario"
+									placeholder="Escribe algo..."  th:object="${comentario}" />
+							</div>
+							<button type="submit" class="enviar">Enviar</button> 
+
+						</form>
+					</td>
+				</tr>
+				<tr>
+					<td><table
+							th:each="comentario : ${publicacion.comentarios}">
+							<tbody>
+								<tr>
+									<td><img id="avatar2" th:src="${comentario.getUsuarioCreador().getAvatar()}"/></td>
+								</tr>
+								<tr>
+									<td>
+									<p th:text="${comentario.getUsuarioCreador().getNombre()}"></p>
+									<p th:text="${comentario.getTexto()}"></p>
+									</td>
+								</tr>
+								<tr>
+									<td th:text="${comentario.getFecha()}"></td>
+								</tr>
+							</tbody>
+						</table></td>
 				</tr>
 			</tbody>
 		</table>
@@ -231,7 +286,14 @@ dialog::backdrop {
 
 	<p />
 
+
+
+
+
+
+
 	<div class="container">
+
 
 		<button id="mostrar" onclick="mostrar" class="btn btn-primary">Añadir
 			estado</button>
@@ -244,38 +306,23 @@ dialog::backdrop {
 			<h1>Nuevo estado</h1>
 			<div class="row">
 				<div class="col-md-offset-2 col-md-8">
-
 					<form method="post" action="#" th:action="@{/home/new}"
 						enctype="multipart/form-data">
-
 						<div class="form-group">
-
 							<label for="comentario"></label> <input type="text"
 								class="comentario" id="comentario" name="comentario"
 								placeholder="¿Que está pasando?" th:object="${comentario}"
 								required="required" />
-
 						</div>
-
 						<div>
-
 							<label for="imagen" class="imagen">Subir imagen:</label> <input
 								id="imagen" name="imagen" type="file" th:object="${imagen}" />
-
 						</div>
-
-
 						<button type="submit" class="enviar">Enviar</button>
-
 					</form>
-
 				</div>
-
 			</div>
-
 		</div>
-
-
 		<button type="button" id="cerrar">Cerrar</button>
 		</dialog>
 	</div>
@@ -301,6 +348,7 @@ dialog::backdrop {
 	<!-- Placed at the end of the document so the pages load faster -->
 
 
+	<!-- 
 	<script>
       //Declaramos la función que recibe el tiempo
       function refrescar(tiempo){
@@ -310,12 +358,13 @@ dialog::backdrop {
       //Podemos ejecutar la función de este modo
       //La página se actualizará dentro de 10 segundos
       refrescar(60000);
-    </script>
+    </script> -->
+
 
 
 
 	<script>
-      var mostar = document.getElementById('mostrar');
+      var mostrar = document.getElementById('mostrar');
       var cerrar = document.getElementById('cerrar');
       var dialogo = document.getElementById('dialogo');
 

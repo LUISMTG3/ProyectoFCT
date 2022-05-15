@@ -1,7 +1,6 @@
 package com.springproyectofct.controladores;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -20,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.springproyectofct.DAO.UsuarioDAO;
 import com.springproyectofct.DAO.UsuarioDaoImpl;
+import com.springproyectofct.modelo.Comentario;
 import com.springproyectofct.modelo.Contacto;
 import com.springproyectofct.modelo.Invitacion;
 import com.springproyectofct.modelo.Publicacion;
@@ -28,6 +28,7 @@ import com.springproyectofct.seguridad.AccesoValido;
 import com.springproyectofct.seguridad.UsuarioValido;
 import com.springproyectofct.util.ImagenUtil;
 import com.springproyectofct.util.InvitacionUtil;
+import com.springproyectofct.util.PublicacionUtil;
 import com.springproyectofct.util.usuarioRepetidoUtil;
 
 @Controller
@@ -40,6 +41,7 @@ public class UsuarioController {
 	private usuarioRepetidoUtil usuRepUtil = new usuarioRepetidoUtil();
 	ImagenUtil imgUtil = new ImagenUtil();
 	InvitacionUtil invitacionUtil = new InvitacionUtil();
+	PublicacionUtil publicUtil = new PublicacionUtil();
 	int loginCorrecto = 1;
 	boolean usuarioRepetido = false;
 	int numeroPublicaciones = 0;
@@ -195,6 +197,7 @@ public class UsuarioController {
 
 			List<String> avatares = new ArrayList<String>();
 
+			
 			for (Contacto contacto : usuarioLogeado.getContactos()) {
 
 				usuarios.add(contacto.getUsuario2());
@@ -220,6 +223,10 @@ public class UsuarioController {
 
 			model.addAttribute("publicacion", new Publicacion());
 
+			model.addAttribute("comentario");
+			
+			model.addAttribute("idPublicacion");
+			
 			return "home";
 
 		}
@@ -236,6 +243,34 @@ public class UsuarioController {
 		return "redirect:/home";
 
 	}
+	
+	
+	@RequestMapping(value = "/home/new/coment/{idPublicacion}")
+	public String añadirComentario(@ModelAttribute(name = "idPublicacion") int idPublicacion,
+			                       @RequestParam(name = "comentario", required = false) String comentario) {
+
+		if (AccesValid.AccesoValido(usuarioLogeado)) {
+			
+		
+		Comentario comentarioNuevo = new Comentario();
+		comentarioNuevo.setTexto(comentario);
+		comentarioNuevo.setFecha(LocalDateTime.now());
+		comentarioNuevo.setUsuarioCreador(usuarioLogeado);
+		
+		Publicacion publicacion = publicUtil.traerPublicacion(idPublicacion);
+		
+		publicacion.añadirComentario(comentarioNuevo);
+		usuario.update(publicacion.getUsuario());
+
+		return "redirect:/home";
+
+		}
+		
+		
+		return "redirect:/";
+		
+	}
+	
 
 	@PostMapping("/home/new")
 	public String home2(@RequestParam(name = "imagen", required = false) MultipartFile multipartFile,
@@ -247,7 +282,7 @@ public class UsuarioController {
 			if (!comentario.isEmpty()) {
 
 				Publicacion publicacion = new Publicacion();
-				publicacion.setComentario(comentario);
+				publicacion.setTitulo(comentario);
 
 				if (!multipartFile.isEmpty()) {
 					publicacion
