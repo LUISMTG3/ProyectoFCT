@@ -16,6 +16,7 @@ import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.Target;
 import org.springframework.lang.NonNull;
 
 @Entity
@@ -33,11 +34,11 @@ public class Publicacion implements Comparator<Publicacion> {
 
 	private LocalDateTime fecha;
 
-	@ManyToOne
+	@ManyToOne(targetEntity = Usuario.class)
 	private Usuario usuario;
 	
 	@LazyCollection(LazyCollectionOption.FALSE)
-	@OneToMany(mappedBy = "publicacion", cascade = CascadeType.ALL, orphanRemoval = true)
+	@OneToMany(mappedBy = "publicacion", cascade = CascadeType.ALL, orphanRemoval = true,targetEntity = Comentario.class)
 	private List<Comentario> comentarios = new ArrayList<>();
 	
 

@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 
 import org.springframework.stereotype.Repository;
 
@@ -92,12 +94,16 @@ public class UsuarioDaoImpl implements UsuarioDAO {
 	public boolean update(Usuario usuario) {
 		
 		
-		EntityManager em = Jpautil.getEntityManager();
+//		EntityManager em = Jpautil.getEntityManager();
+		
+		EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoFCTSpring");
+
+		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
 		
 		em.merge(usuario);
-		
+
 		em.getTransaction().commit();
 		
 		em.close();

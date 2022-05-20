@@ -6,7 +6,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.boot.web.servlet.error.ErrorAttributes;
+import org.springframework.boot.web.servlet.error.ErrorController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +22,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.context.request.RequestAttributes;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import com.springproyectofct.DAO.UsuarioDAO;
 import com.springproyectofct.DAO.UsuarioDaoImpl;
@@ -32,7 +44,7 @@ import com.springproyectofct.util.PublicacionUtil;
 import com.springproyectofct.util.usuarioRepetidoUtil;
 
 @Controller
-public class UsuarioController {
+public class UsuarioController implements ErrorController {
 
 	private UsuarioDAO usuario = new UsuarioDaoImpl();
 	private Usuario usuarioLogeado = new Usuario();
@@ -47,8 +59,10 @@ public class UsuarioController {
 	int numeroPublicaciones = 0;
 	int ultimaPublicacion = 9;
 	MultipartFile imagen;
-	String ruta = "C:\\Users\\willt\\eclipse-workspace2\\ProyectoFCTSpring\\target\\classes\\static\\";
+	String ruta = "C:\\Users\\willt\\eclipse-workspace2\\ProyectoFCTSpring\\target\\classes\\static";
 	String fomartoFecha = "dd.MM'T'HH.mm";
+	private ErrorAttributes errorAttributes;
+	private final static String ERROR_PATH = "/error";
 
 	@PostMapping("/validarUsuario")
 	public String validarUsuario(@ModelAttribute("usuarioLogin") Usuario usuarioLogin, Model model) {
@@ -191,13 +205,16 @@ public class UsuarioController {
 
 		if (AccesValid.AccesoValido(usuarioLogeado)) {
 
+			usuarioLogeado = usuario.findOne(loginCorrecto);
+			
+			usuario.update(usuarioLogeado);
+			
 			List<Publicacion> publicaciones = new ArrayList<Publicacion>();
 
 			List<Usuario> usuarios = new ArrayList<Usuario>();
 
 			List<String> avatares = new ArrayList<String>();
 
-			
 			for (Contacto contacto : usuarioLogeado.getContactos()) {
 
 				usuarios.add(contacto.getUsuario2());
@@ -210,10 +227,9 @@ public class UsuarioController {
 
 			Collections.sort(publicaciones, new Publicacion());
 
-			if((ultimaPublicacion += numeroPublicaciones)< (publicaciones.size() - 1)) {
+			if ((ultimaPublicacion += numeroPublicaciones) < (publicaciones.size() - 1)) {
 				publicaciones.subList(ultimaPublicacion, publicaciones.size()).clear();
 			}
-			
 
 			model.addAttribute("listaPublicaciones", publicaciones);
 
@@ -224,9 +240,9 @@ public class UsuarioController {
 			model.addAttribute("publicacion", new Publicacion());
 
 			model.addAttribute("comentario");
-			
+
 			model.addAttribute("idPublicacion");
-			
+
 			return "home";
 
 		}
@@ -243,34 +259,56 @@ public class UsuarioController {
 		return "redirect:/home";
 
 	}
-	
-	
-	@RequestMapping(value = "/home/new/coment/{idPublicacion}")
-	public String añadirComentario(@ModelAttribute(name = "idPublicacion") int idPublicacion,
-			                       @RequestParam(name = "comentario", required = false) String comentario) {
+
+	@PostMapping(value = "/home/new/coment/{idPublicacion}")
+	public String añadirComentario(@PathVariable(name = "idPublicacion" , required = true) int idPublicacion,
+			@RequestParam(name = "comentario", required = false) String comentario) throws InterruptedException {
 
 		if (AccesValid.AccesoValido(usuarioLogeado)) {
 			
-		
-		Comentario comentarioNuevo = new Comentario();
-		comentarioNuevo.setTexto(comentario);
-		comentarioNuevo.setFecha(LocalDateTime.now());
-		comentarioNuevo.setUsuarioCreador(usuarioLogeado);
-		
-		Publicacion publicacion = publicUtil.traerPublicacion(idPublicacion);
-		
-		publicacion.añadirComentario(comentarioNuevo);
-		usuario.update(publicacion.getUsuario());
+			
+			Comentario comentarioNuevo = new Comentario();
+			comentarioNuevo.setTexto(comentario);
+			comentarioNuevo.setFecha(LocalDateTime.now());
+			comentarioNuevo.setUsuarioCreador(usuarioLogeado);
 
-		return "redirect:/home";
+			Publicacion publicacion = new Publicacion();
+
+			for (Usuario usuario2 : usuario.findAll()) {
+
+				for (Publicacion publicacionIndex : usuario2.getPublicaciones()) {
+
+					if (publicacionIndex.getId() == idPublicacion) {
+
+						publicacion = publicacionIndex;
+
+						System.out.println("           HOLAAAAAAA        ");
+						
+					}
+				}
+			}
+
+//			Publicacion publicacion = publicUtil.traerPublicacion(idPublicacion);
+
+			
+			
+			publicacion.añadirComentario(comentarioNuevo);
+
+			System.out.println(idPublicacion + "\n \n " + comentarioNuevo.getUsuarioCreador());
+
+			System.out.println(usuarioLogeado.getNombre() + "      Usuario logueado");
+
+			System.out.println(publicacion.getUsuario().getNombre() + " \n ");
+
+			usuario.update(publicacion.getUsuario());
+
+			return "redirect:/home";
 
 		}
-		
-		
+
 		return "redirect:/";
-		
+
 	}
-	
 
 	@PostMapping("/home/new")
 	public String home2(@RequestParam(name = "imagen", required = false) MultipartFile multipartFile,
@@ -286,18 +324,20 @@ public class UsuarioController {
 
 				if (!multipartFile.isEmpty()) {
 					publicacion
-							.setImagen("imagenes\\"
+							.setImagen("\\imagenes\\"
 									+ LocalDateTime.now()
 											.format(DateTimeFormatter.ofPattern("yyyy_MM_dd'T'HH.mm.ss.SSS")).toString()
 									+ multipartFile.getOriginalFilename());
 
 					imgUtil.guardarImagen(ruta + publicacion.getImagen(), multipartFile);
 
-				}else {
+				} else {
 					publicacion.setImagen(null);
 				}
 
 				publicacion.setFecha(LocalDateTime.now());
+
+				publicacion.setUsuario(usuarioLogeado);
 
 				usuarioLogeado = usuario.findOne(loginCorrecto);
 
@@ -348,7 +388,7 @@ public class UsuarioController {
 
 		if (multipartFile != null) {
 
-			nuevoUsuario.setAvatar("avatares\\"
+			nuevoUsuario.setAvatar("\\imagenes\\"
 					+ LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy_MM_dd'T'HH.mm.ss.SSS")).toString()
 					+ multipartFile.getOriginalFilename());
 
@@ -359,6 +399,52 @@ public class UsuarioController {
 		usuario.create(nuevoUsuario);
 
 		return "redirect:/";
+	}
+
+	public void AppErrorController(ErrorAttributes errorAttributes) {
+		this.errorAttributes = errorAttributes;
+	}
+
+	@RequestMapping(value = ERROR_PATH, produces = "text/html")
+	public ModelAndView errorHtml(HttpServletRequest request) {
+		return new ModelAndView("redirect:/home");
+	}
+
+	@RequestMapping(value = ERROR_PATH)
+	@ResponseBody
+	public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
+		Map<String, Object> body = getErrorAttributes(request, getTraceParameter(request));
+		HttpStatus status = getStatus(request);
+		return new ResponseEntity<Map<String, Object>>(body, status);
+	}
+
+	@Override
+	public String getErrorPath() {
+		return ERROR_PATH;
+	}
+
+	private boolean getTraceParameter(HttpServletRequest request) {
+		String parameter = request.getParameter("trace");
+		if (parameter == null) {
+			return false;
+		}
+		return !"false".equals(parameter.toLowerCase());
+	}
+
+	private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
+		RequestAttributes requestAttributes = new ServletRequestAttributes(request);
+		return this.errorAttributes.getErrorAttributes((WebRequest) requestAttributes, includeStackTrace);
+	}
+
+	private HttpStatus getStatus(HttpServletRequest request) {
+		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+		if (statusCode != null) {
+			try {
+				return HttpStatus.valueOf(statusCode);
+			} catch (Exception ex) {
+			}
+		}
+		return HttpStatus.INTERNAL_SERVER_ERROR;
 	}
 
 }

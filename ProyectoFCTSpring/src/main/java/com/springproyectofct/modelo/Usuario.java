@@ -30,8 +30,9 @@ public class Usuario {
 	private String nombre;
 
 	private String password;
-
-	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true, fetch=FetchType.EAGER)
+	
+	@LazyCollection(LazyCollectionOption.FALSE)
+	@OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Publicacion> publicaciones = new ArrayList<>();
 	
 	@LazyCollection(LazyCollectionOption.FALSE)

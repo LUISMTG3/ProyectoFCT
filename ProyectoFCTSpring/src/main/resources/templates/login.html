@@ -9,8 +9,6 @@
 <meta name="author" content="">
 <title>Iniciar</title>
 <style type="text/css">
-
-
 a {
 	color: #fff;
 	cursor: pointer;
@@ -76,6 +74,12 @@ div.container {
 
 dialog::backdrop {
 	background: rgba(0, 0, 0, .6);
+}
+
+#mensajeError {
+	margin-left: 28%;
+	background-color: white;
+	border-radius: 7px;
 }
 
 #mostrar {
@@ -145,7 +149,7 @@ dialog::backdrop {
 						class="icon-bar"></span> <span class="icon-bar"></span> <span
 						class="icon-bar"></span>
 				</button>
-				<a class="navbar-brand" href="#">MiRedSocial.com</a>
+				<a class="navbar-brand" href="/">MiRedSocial.com</a>
 			</div>
 			<div id="navbar" class="collapse navbar-collapse">
 				<ul class="nav navbar-nav">
@@ -200,7 +204,7 @@ dialog::backdrop {
 		</div>
 
 
-		<div class="mensajeError">
+		<div id="mensajeError" class="mensajeError">
 			<div class="col-md-offset-2 col-md-8">
 				<div th:if="${loginCorrecto == 0}" class="form-group">
 					<h1>Usuario incorrecto</h1>

@@ -24,8 +24,10 @@ public class PublicacionUtil {
 			
 			for(Publicacion publicacionIndex : usuario2.getPublicaciones()) {
 				
-				if(publicacionIndex.equals(publicacion)) {
+				if(publicacionIndex.getId() == publicacion.getId()) {
+					
 					return publicacionIndex;
+				
 				}
 			}
 		}

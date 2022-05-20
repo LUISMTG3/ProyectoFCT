@@ -24,7 +24,7 @@ public class Comentario {
 	@ManyToOne
 	private Publicacion publicacion;
 	
-	@ManyToOne
+	@ManyToOne(targetEntity = Usuario.class)
 	private Usuario usuarioCreador;
 	
 	public Usuario getUsuarioCreador() {

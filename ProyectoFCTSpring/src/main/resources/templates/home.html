@@ -10,7 +10,7 @@
 
 <title>Starter Template for Bootstrap</title>
 <style type="text/css">
-a {
+a, button {
 	color: #fff;
 	cursor: pointer;
 	display: block;
@@ -18,19 +18,19 @@ a {
 	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
-a:hover {
-	color: #000 !important;
+a:hover, button:hover {
+	color: rgb(77, 77, 77) !important;
 	background-color: transparent;
 	text-shadow: nthree;
 }
 
-a:before {
+a:before, button:before {
 	left: 0%;
 	right: auto;
 	width: 100%;
 }
 
-a:before {
+a:before, button:before {
 	display: block;
 	position: absolute;
 	top: 0px;
@@ -44,7 +44,7 @@ a:before {
 	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
-a:after {
+a:after, button:after {
 	opacity: 0;
 	background-image: -webkit-linear-gradient(transparent 50%, rgba(101, 179, 122, 0.2)
 		50%);
@@ -57,11 +57,31 @@ a:after {
 	transform: translateX(-50%) translateY(-50%) rotate(90deg);
 }
 
+#dialogo {
+	width: 50%;
+	height: 60%;
+}
+
+#imagenSub {
+	margin-left: 25%;
+}
+
+#textComent {
+	width: 600px;
+	height: 100px;
+	width: 600px;
+}
+
+#textComent::placeholder {
+	text-align: center;
+}
+
 #contactos {
 	width: 20%;
 	margin-top: 5%;
 	margin-left: 8%;
 	position: absolute;
+	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
 }
 
 #publicacion {
@@ -73,11 +93,17 @@ a:after {
 }
 
 #publicaciones {
-	width: 70%;
+	width: 50%;
 	align-content: right;
 	margin-top: 5%;
-	padding-right: 20%;
 	position: absolute;
+	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+}
+
+#seccion {
+	background-color: #d4d4d4;
+	border-radius: 0.5%;
+	margin-top: 5px;
 }
 
 #mostrar {
@@ -87,6 +113,8 @@ a:after {
 }
 
 #avatar {
+	max-width: 100%;
+	max-height: 100%;
 	width: 90px;
 	height: 90px;
 	border-radius: 50%;
@@ -101,6 +129,19 @@ a:after {
 	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
 }
 
+#avatar3 {
+	size: 100%;
+	width: 50px;
+	height: 50px;
+	border-radius: 50%;
+	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+	padding-top: 5px;
+}
+
+#boton {
+	margin-left: 40%;
+}
+
 #fechaPublicacion {
 	padding-top: 2%;
 	padding-left: 70%;
@@ -113,14 +154,23 @@ hr {
 	height: 0;
 }
 
+#fechaPublicacion {
+	padding-left: 65%;
+}
+
+#formComent {
+	padding-top: 20px;
+}
+
 #nombre {
 	margin-left: 10px;
 }
 
 #fotos {
 	size: 100%;
+	width: 100%;
+	height: 100%;
 	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
-	margin-top: 3.5%;
 	align-content: left;
 }
 
@@ -141,13 +191,11 @@ dialog::backdrop {
 	border: none;
 }
 
-#cerrar {
-	background: #232b79;
-	color: #ffffff;
+#separadorComent {
 	border: none;
-	border-radius: 5px;
-	padding: .4rem 1rem;
-	cursor: pointer;
+	height: 0.5px; /* Set the hr color */
+	color: #333; /* old IE */
+	background-image: linear-gradient(90deg, black, transparent);
 }
 </style>
 
@@ -188,7 +236,7 @@ dialog::backdrop {
 					class="icon-bar"></span> <span class="icon-bar"></span> <span
 					class="icon-bar"></span>
 			</button>
-			<a class="navbar-brand" href="#">MiRedSocial.com</a>
+			<a class="navbar-brand" href="/">MiRedSocial.com</a>
 		</div>
 		<div id="navbar" class="collapse navbar-collapse">
 			<ul class="nav navbar-nav">
@@ -219,17 +267,23 @@ dialog::backdrop {
 
 	<div id="publicaciones" class="col-md-offset-4 col-md-7">
 		<h1>Publicaciones</h1>
+
 		<table th:each="publicacion : ${listaPublicaciones}">
+
 			<tbody>
-				<hr />
+
+				<hr id="separadorComent" />
 				<tr>
 					<td><img id="avatar2"
 						th:src="${publicacion.getUsuario().getAvatar()}"><span
-						id="nombre" th:text="${publicacion.getUsuario().getNombre()}"></span></td>
+						id="nombre" th:text="${publicacion.getUsuario().getNombre()}"></span>
+						<span id="fechaPublicacion"
+						th:text="${publicacion.getFecha().getDayOfMonth() + ' de ' + publicacion.getFecha().getMonth() + 
+									' a las ' + publicacion.getFecha().getHour()+':'+ publicacion.getFecha().getMinute()}"></span></td>
 
 				</tr>
 				<tr>
-					<td><br> <br></td>
+					<td><br></td>
 				</tr>
 				<tr>
 					<td id="textoPublicacion" th:text="${publicacion.titulo}"></td>
@@ -242,46 +296,61 @@ dialog::backdrop {
 				<tr th:if="${publicacion.imagen == null}">
 					<td></td>
 				</tr>
-				<tr>
-					<td><a id="mostrarComentarios">Comentarios</a> <span
-						id="fechaPublicacion"
-						th:text="${#temporals.format(publicacion.fecha, 'dd-MM-yyyy HH:mm')}"></span>
-					</td>
-				</tr>
+
 				<tr>
 					<td>
-						<form th:action="@{/home/new/coment/{idPublicacion}(idPublicacion=${publicacion.id})}">
-						
+						<form id="formComent" method="post"
+							th:action="@{/home/new/coment/{idPublicacion}(idPublicacion=${publicacion.id})}">
+
 							<div class="form-group">
-								<input type="text" class="form-control" id="comentario" name="comentario"
-									placeholder="Escribe algo..."  th:object="${comentario}" />
+								<input type="text" class="form-control" id="comentario"
+									name="comentario" placeholder="Escribe algo..."
+									th:object="${comentario}" />
 							</div>
-							<button type="submit" class="enviar">Enviar</button> 
+							<button type="submit" class="btn btn-primary" data-toggle="modal"
+								data-target="#updateModal">Enviar</button>
 
 						</form>
 					</td>
 				</tr>
 				<tr>
-					<td><table
+					<td><table id="comentario"
 							th:each="comentario : ${publicacion.comentarios}">
 							<tbody>
 								<tr>
-									<td><img id="avatar2" th:src="${comentario.getUsuarioCreador().getAvatar()}"/></td>
+									<td><img id="avatar3"
+										th:src="${comentario.getUsuarioCreador().getAvatar()}" /> <span
+										id="nombre"
+										th:text="${comentario.getUsuarioCreador().getNombre()}"></span></td>
+								</tr>
+								<tr>
+									<td><br></td>
 								</tr>
 								<tr>
 									<td>
-									<p th:text="${comentario.getUsuarioCreador().getNombre()}"></p>
-									<p th:text="${comentario.getTexto()}"></p>
+										<p th:text="${comentario.getTexto()}"></p>
 									</td>
 								</tr>
 								<tr>
-									<td th:text="${comentario.getFecha()}"></td>
+									<td
+										th:text="${comentario.getFecha().getDayOfMonth() + ' de ' + comentario.getFecha().getMonth() + 
+									' a las ' + comentario.getFecha().getHour()+':'+ comentario.getFecha().getMinute()}"></td>
 								</tr>
 							</tbody>
 						</table></td>
 				</tr>
+
+
 			</tbody>
+
 		</table>
+		<br>
+		<hr />
+		<br> <a id="boton"
+			th:href="@{/home/{numeroPublicaciones}(numeroPublicaciones=${10})}"
+			class="btn btn-primary" type="submit">Ver más...</a>
+		<p></p>
+		<p></p>
 	</div>
 
 	<p />
@@ -303,34 +372,34 @@ dialog::backdrop {
 		<dialog id="dialogo" class="dialogo-estilo">
 
 		<div class="starter-template">
+
 			<h1>Nuevo estado</h1>
-			<div class="row">
-				<div class="col-md-offset-2 col-md-8">
-					<form method="post" action="#" th:action="@{/home/new}"
-						enctype="multipart/form-data">
-						<div class="form-group">
-							<label for="comentario"></label> <input type="text"
-								class="comentario" id="comentario" name="comentario"
-								placeholder="¿Que está pasando?" th:object="${comentario}"
-								required="required" />
-						</div>
-						<div>
-							<label for="imagen" class="imagen">Subir imagen:</label> <input
-								id="imagen" name="imagen" type="file" th:object="${imagen}" />
-						</div>
-						<button type="submit" class="enviar">Enviar</button>
-					</form>
+
+
+			<form method="post" action="#" th:action="@{/home/new}"
+				enctype="multipart/form-data">
+				<div class="form-group">
+					<label for="comentario"></label> <input type="text"
+						class="comentario" id="textComent" name="comentario"
+						placeholder="¿Que está pasando?" th:object="${comentario}"
+						required="required" />
 				</div>
-			</div>
+				<div>
+					<label for="imagen" id="imagenTag" class="imagen">Subir
+						imagen:</label> <input id="imagenSub" name="imagen" type="file"
+						th:object="${imagen}" />
+				</div>
+				<button type="submit" id="enviar" class="btn btn-primary">Enviar</button>
+			</form>
+
+
 		</div>
-		<button type="button" id="cerrar">Cerrar</button>
+		<button type="button" id="cerrar" class="btn btn-primary">Cerrar</button>
 		</dialog>
 	</div>
 
 
-	<a id="boton"
-		th:href="@{/home/{numeroPublicaciones}(numeroPublicaciones=${10})}"
-		class="btn btn-primary" type="submit">Mas...</a>
+
 
 
 
