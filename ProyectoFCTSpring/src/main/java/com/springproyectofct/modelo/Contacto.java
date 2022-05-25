@@ -1,5 +1,7 @@
 package com.springproyectofct.modelo;
 
+import java.util.Objects;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -29,6 +31,23 @@ public class Contacto {
 		this.usuario2 = usuario2;
 	}
 
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id, usuario1, usuario2);
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		Contacto other = (Contacto) obj;
+		return id == other.id && Objects.equals(usuario1, other.usuario1) && Objects.equals(usuario2, other.usuario2);
+	}
 
 	public int getId() {
 		return id;

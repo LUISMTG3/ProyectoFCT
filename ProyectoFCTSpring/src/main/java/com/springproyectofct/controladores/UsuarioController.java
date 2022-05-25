@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.persistence.EntityManager;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -38,13 +39,15 @@ import com.springproyectofct.modelo.Publicacion;
 import com.springproyectofct.modelo.Usuario;
 import com.springproyectofct.seguridad.AccesoValido;
 import com.springproyectofct.seguridad.UsuarioValido;
+import com.springproyectofct.util.ContactoUtil;
 import com.springproyectofct.util.ImagenUtil;
 import com.springproyectofct.util.InvitacionUtil;
+import com.springproyectofct.util.Jpautil;
 import com.springproyectofct.util.PublicacionUtil;
 import com.springproyectofct.util.usuarioRepetidoUtil;
 
 @Controller
-public class UsuarioController implements ErrorController {
+public class UsuarioController {
 
 	private UsuarioDAO usuario = new UsuarioDaoImpl();
 	private Usuario usuarioLogeado = new Usuario();
@@ -54,16 +57,21 @@ public class UsuarioController implements ErrorController {
 	ImagenUtil imgUtil = new ImagenUtil();
 	InvitacionUtil invitacionUtil = new InvitacionUtil();
 	PublicacionUtil publicUtil = new PublicacionUtil();
+	ContactoUtil contactoUtil = new ContactoUtil();
 	int loginCorrecto = 1;
 	boolean usuarioRepetido = false;
 	int numeroPublicaciones = 0;
 	int ultimaPublicacion = 9;
 	MultipartFile imagen;
+//	String ruta = "C:\\Users\\willt\\eclipse-workspace2\\ProyectoFCTSpring\\src\\main\\resources\\static";
 	String ruta = "C:\\Users\\willt\\eclipse-workspace2\\ProyectoFCTSpring\\target\\classes\\static";
 	String fomartoFecha = "dd.MM'T'HH.mm";
 	private ErrorAttributes errorAttributes;
 	private final static String ERROR_PATH = "/error";
 
+	
+	
+	
 	@PostMapping("/validarUsuario")
 	public String validarUsuario(@ModelAttribute("usuarioLogin") Usuario usuarioLogin, Model model) {
 
@@ -85,11 +93,15 @@ public class UsuarioController implements ErrorController {
 
 		if (AccesValid.AccesoValido(usuarioLogeado)) {
 
-			List<Usuario> usuarios = new ArrayList<Usuario>();
+			List<Usuario> usuarios = contactoUtil.traerNoContactos(usuarioLogeado);
+						
+			List<Usuario> usuariosContactados = contactoUtil.traerContactos(usuarioLogeado);
 
-			usuarios.addAll(usuario.findAll());
-
+			usuarios.remove(usuarioLogeado);
+			
 			model.addAttribute("listaUsuarios", usuarios);
+			
+			model.addAttribute("listaContactos", usuariosContactados);
 
 			model.addAttribute("id");
 
@@ -149,6 +161,37 @@ public class UsuarioController implements ErrorController {
 		return "redirect:/";
 
 	}
+	
+	
+	@RequestMapping(value = "/eliminarContacto/{id}")
+	public String eliminarContacto(@ModelAttribute(name = "id") int id) {
+
+		if (AccesValid.AccesoValido(usuarioLogeado)) {
+
+			Usuario usuarioEliminado = usuario.findOne(id);	
+			
+			Contacto contacto = contactoUtil.buscarContacto(usuarioLogeado, usuarioEliminado);
+			
+			System.out.println(contacto.getId());
+			System.out.println(contacto.getUsuario1().getNombre());
+			System.out.println(contacto.getUsuario2().getNombre());
+			
+			usuarioLogeado.eliminarContacto(contacto);
+
+			usuarioEliminado.eliminarContacto(contacto);
+			
+			usuario.update(usuarioEliminado);
+
+			usuario.update(usuarioLogeado);
+
+			return "redirect:/usuario/contactos";
+
+		}
+
+		return "redirect:/";
+
+	}
+	
 
 	@GetMapping("/usuario/invitaciones")
 	public String listadoInvitaciones(Model model) {
@@ -203,6 +246,8 @@ public class UsuarioController implements ErrorController {
 	@GetMapping("/home")
 	public String home(Model model) throws IllegalStateException, IOException {
 
+
+		
 		if (AccesValid.AccesoValido(usuarioLogeado)) {
 
 			usuarioLogeado = usuario.findOne(loginCorrecto);
@@ -401,50 +446,50 @@ public class UsuarioController implements ErrorController {
 		return "redirect:/";
 	}
 
-	public void AppErrorController(ErrorAttributes errorAttributes) {
-		this.errorAttributes = errorAttributes;
-	}
-
-	@RequestMapping(value = ERROR_PATH, produces = "text/html")
-	public ModelAndView errorHtml(HttpServletRequest request) {
-		return new ModelAndView("redirect:/home");
-	}
-
-	@RequestMapping(value = ERROR_PATH)
-	@ResponseBody
-	public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
-		Map<String, Object> body = getErrorAttributes(request, getTraceParameter(request));
-		HttpStatus status = getStatus(request);
-		return new ResponseEntity<Map<String, Object>>(body, status);
-	}
-
-	@Override
-	public String getErrorPath() {
-		return ERROR_PATH;
-	}
-
-	private boolean getTraceParameter(HttpServletRequest request) {
-		String parameter = request.getParameter("trace");
-		if (parameter == null) {
-			return false;
-		}
-		return !"false".equals(parameter.toLowerCase());
-	}
-
-	private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
-		RequestAttributes requestAttributes = new ServletRequestAttributes(request);
-		return this.errorAttributes.getErrorAttributes((WebRequest) requestAttributes, includeStackTrace);
-	}
-
-	private HttpStatus getStatus(HttpServletRequest request) {
-		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
-		if (statusCode != null) {
-			try {
-				return HttpStatus.valueOf(statusCode);
-			} catch (Exception ex) {
-			}
-		}
-		return HttpStatus.INTERNAL_SERVER_ERROR;
-	}
+//	public void AppErrorController(ErrorAttributes errorAttributes) {
+//		this.errorAttributes = errorAttributes;
+//	}
+//
+//	@RequestMapping(value = ERROR_PATH, produces = "text/html")
+//	public ModelAndView errorHtml(HttpServletRequest request) {
+//		return new ModelAndView("redirect:/home");
+//	}
+//
+//	@RequestMapping(value = ERROR_PATH)
+//	@ResponseBody
+//	public ResponseEntity<Map<String, Object>> error(HttpServletRequest request) {
+//		Map<String, Object> body = getErrorAttributes(request, getTraceParameter(request));
+//		HttpStatus status = getStatus(request);
+//		return new ResponseEntity<Map<String, Object>>(body, status);
+//	}
+//
+//	@Override
+//	public String getErrorPath() {
+//		return ERROR_PATH;
+//	}
+//
+//	private boolean getTraceParameter(HttpServletRequest request) {
+//		String parameter = request.getParameter("trace");
+//		if (parameter == null) {
+//			return false;
+//		}
+//		return !"false".equals(parameter.toLowerCase());
+//	}
+//
+//	private Map<String, Object> getErrorAttributes(HttpServletRequest request, boolean includeStackTrace) {
+//		RequestAttributes requestAttributes = new ServletRequestAttributes(request);
+//		return this.errorAttributes.getErrorAttributes((WebRequest) requestAttributes, includeStackTrace);
+//	}
+//
+//	private HttpStatus getStatus(HttpServletRequest request) {
+//		Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
+//		if (statusCode != null) {
+//			try {
+//				return HttpStatus.valueOf(statusCode);
+//			} catch (Exception ex) {
+//			}
+//		}
+//		return HttpStatus.INTERNAL_SERVER_ERROR;
+//	}
 
 }

@@ -94,11 +94,11 @@ public class UsuarioDaoImpl implements UsuarioDAO {
 	public boolean update(Usuario usuario) {
 		
 		
-//		EntityManager em = Jpautil.getEntityManager();
+		EntityManager em = Jpautil.getEntityManager();
 		
-		EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoFCTSpring");
+//		EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoFCTSpring");
 
-		EntityManager em = emf.createEntityManager();
+//		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
 		
@@ -112,9 +112,25 @@ public class UsuarioDaoImpl implements UsuarioDAO {
 	}
 
 	@Override
-	public boolean delete(int id) {
-		// TODO Auto-generated method stub
-		return false;
+	public boolean delete(Usuario usuario) {
+		
+
+		EntityManager em = Jpautil.getEntityManager();
+		
+//		EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoFCTSpring");
+
+//		EntityManager em = emf.createEntityManager();
+		
+		em.getTransaction().begin();
+		
+		em.remove(usuario);
+
+		em.getTransaction().commit();
+		
+		em.close();
+		
+		return true;
+		
 	}
 
 }

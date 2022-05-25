@@ -14,7 +14,7 @@
 <style>
 
 
-a {
+a, button {
 	color: #fff;
 	cursor: pointer;
 	display: block;
@@ -22,19 +22,19 @@ a {
 	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
-a:hover {
-	color: #000 !important;
+a:hover, button:hover {
+	color: rgb(77, 77, 77) !important;
 	background-color: transparent;
 	text-shadow: nthree;
 }
 
-a:before {
+a:before, button:before {
 	left: 0%;
 	right: auto;
 	width: 100%;
 }
 
-a:before {
+a:before, button:before {
 	display: block;
 	position: absolute;
 	top: 0px;
@@ -48,7 +48,7 @@ a:before {
 	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
-a:after {
+a:after, button:after {
 	opacity: 0;
 	background-image: -webkit-linear-gradient(transparent 50%, rgba(101, 179, 122, 0.2)
 		50%);
@@ -136,7 +136,7 @@ img {
 								id="imagen" name="imagen" type="file" th:object="${imagen}" />
 
 						</div>
-						<button type="submit" class="enviar">Enviar</button>
+						<button type="submit" class="btn btn-primary">Registrarse</button>
 
 						<div th:if="${usuarioRepetido}" class="form-group">
 							<h3>Usuario Repetido, pruebe con otro nombre</h3>

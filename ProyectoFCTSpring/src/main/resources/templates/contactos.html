@@ -11,9 +11,7 @@
 <title>Starter Template for Bootstrap</title>
 
 <style type="text/css">
-
-
-a {
+a, button {
 	color: #fff;
 	cursor: pointer;
 	display: block;
@@ -21,19 +19,19 @@ a {
 	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
-a:hover {
-	color: #000 !important;
+a:hover, button:hover {
+	color: rgb(77, 77, 77) !important;
 	background-color: transparent;
 	text-shadow: nthree;
 }
 
-a:before {
+a:before, button:before {
 	left: 0%;
 	right: auto;
 	width: 100%;
 }
 
-a:before {
+a:before, button:before {
 	display: block;
 	position: absolute;
 	top: 0px;
@@ -47,18 +45,18 @@ a:before {
 	transition: all 0.2s cubic-bezier(0.42, 0, 0.58, 1);
 }
 
-
-a:after {
+a:after, button:after {
 	opacity: 0;
-	background-image: -webkit-linear-gradient( transparent 50%, rgba(101,179,122,0.2) 50%);
-	background-image: -moz-linear-gradient(transparent 50%, rgba(101,179,122,0.2) 50%);
+	background-image: -webkit-linear-gradient(transparent 50%, rgba(101, 179, 122, 0.2)
+		50%);
+	background-image: -moz-linear-gradient(transparent 50%, rgba(101, 179, 122, 0.2)
+		50%);
 	background-size: 10px 10px;
 	-moz-transform: translateX(-50%) translateY(-50%) rotate(90deg);
 	-ms-transform: translateX(-50%) translateY(-50%) rotate(90deg);
 	-webkit-transform: translateX(-50%) translateY(-50%) rotate(90deg);
 	transform: translateX(-50%) translateY(-50%) rotate(90deg);
 }
-
 
 img {
 	border-radius: 50%;
@@ -82,6 +80,24 @@ dialog::backdrop {
 	border-radius: 5px;
 	padding: .4rem 1rem;
 	cursor: pointer;
+}
+
+#usuarios {
+	width: 40%;
+	align-content: right;
+	margin-top: 5%;
+	position: absolute;
+	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+	margin-left: 54%;
+}
+
+#amigos {
+	width: 40%;
+	align-content: right;
+	margin-top: 5%;
+	position: absolute;
+	box-shadow: 0 8px 8px 0 rgba(0, 0, 0, 0.15);
+	margin-left: 5%;
 }
 </style>
 
@@ -125,11 +141,11 @@ dialog::backdrop {
 
 	</nav>
 
-	<div class="container">
+	<div id="usuarios" class="col-md-offset-4 col-md-7">
 
 		<div class="lista">
 			<h1>Listado de usuarios</h1>
-			<table class="table">
+			<table class="table" th:if="${!listaUsuarios.isEmpty()}">
 				<tbody>
 					<tr th:each="usuario : ${listaUsuarios}">
 						<td th:text="${usuario.nombre}"></td>
@@ -139,6 +155,27 @@ dialog::backdrop {
 						<td><a id="boton"
 							th:href="@{/solicitud/{id}(id=${usuario.id})}"
 							class="btn btn-primary" type="submit">Agregar..</a></td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+
+	</div>
+
+	<div id="amigos" class="col-md-offset-4 col-md-7">
+
+		<div class="lista">
+			<h1>Listado de amigos</h1>
+			<table class="table" th:if="${!listaContactos.isEmpty()}">
+				<tbody>
+					<tr th:each="usuario : ${listaContactos}">
+						<td th:text="${usuario.nombre}"></td>
+						<td><img id="avatar" th:src="${usuario.avatar}" width="150"
+							height="150"></td>
+						<td th:text="${usuario.email}"></td>
+						<td><a id="boton"
+							th:href="@{/eliminarContacto/{id}(id=${usuario.id})}"
+							class="btn btn-primary" type="submit">Eliminar..</a></td>
 					</tr>
 				</tbody>
 			</table>
