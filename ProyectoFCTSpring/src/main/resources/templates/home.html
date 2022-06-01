@@ -304,7 +304,7 @@ dialog::backdrop {
 
 							<div class="form-group">
 								<input type="text" class="form-control" id="comentario"
-									name="comentario" placeholder="Escribe algo..."
+									name="comentario" maxlength="500" placeholder="Escribe algo..."
 									th:object="${comentario}" />
 							</div>
 							<button type="submit" class="btn btn-primary" data-toggle="modal"
@@ -380,7 +380,7 @@ dialog::backdrop {
 				enctype="multipart/form-data">
 				<div class="form-group">
 					<label for="comentario"></label> <input type="text"
-						class="comentario" id="textComent" name="comentario"
+						class="comentario" id="textComent" maxlength="1000" name="comentario"
 						placeholder="¿Que está pasando?" th:object="${comentario}"
 						required="required" />
 				</div>

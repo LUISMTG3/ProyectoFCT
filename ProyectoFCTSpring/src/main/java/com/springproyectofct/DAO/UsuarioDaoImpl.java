@@ -28,10 +28,6 @@ public class UsuarioDaoImpl implements UsuarioDAO {
 
 		EntityManager em = Jpautil.getEntityManager();
 
-//		EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoFCTSpring");
-
-//		EntityManager em = emf.createEntityManager();
-
 		usuarios.addAll(em.createQuery("select c from Usuario c", Usuario.class).getResultList());
 
 		em.close();
@@ -50,8 +46,6 @@ public class UsuarioDaoImpl implements UsuarioDAO {
 		Usuario usuario = new Usuario();
 
 		EntityManager em = Jpautil.getEntityManager();
-
-//		usuario = (Usuario) em.createQuery("select c from Usuario c where id = ?", Usuario.class);
 
 		usuario = em.find(Usuario.class, id);
 
@@ -96,10 +90,6 @@ public class UsuarioDaoImpl implements UsuarioDAO {
 		
 		EntityManager em = Jpautil.getEntityManager();
 		
-//		EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoFCTSpring");
-
-//		EntityManager em = emf.createEntityManager();
-		
 		em.getTransaction().begin();
 		
 		em.merge(usuario);
@@ -116,10 +106,6 @@ public class UsuarioDaoImpl implements UsuarioDAO {
 		
 
 		EntityManager em = Jpautil.getEntityManager();
-		
-//		EntityManagerFactory emf = Persistence.createEntityManagerFactory("ProyectoFCTSpring");
-
-//		EntityManager em = emf.createEntityManager();
 		
 		em.getTransaction().begin();
 		

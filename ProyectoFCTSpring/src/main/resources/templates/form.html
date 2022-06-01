@@ -118,18 +118,18 @@ img {
 
 						<div class="form-group">
 							<label for="nombre">Nombre</label> <input type="text"
-								class="form-control" id="nombre" placeholder="Nombre"
+								class="form-control" id="nombre"  maxlength="30" placeholder="Nombre"
 								th:field="*{nombre}" />
 						</div>
 						<div class="form-group">
 							<label for="password">Password</label> <input type="password"
-								class="form-control" id="password" placeholder="Password"
+								class="form-control" id="password" maxlength="20" placeholder="Password"
 								th:field="*{password}" />
 						</div>
 						<div class="form-group">
 							<label for="email">Email</label> <input type="text"
 								class="form-control" id="email"
-								placeholder="usuario@hotmail.net" th:field="*{email}" />
+								placeholder="usuario@hotmail.net" maxlength="30" th:field="*{email}" />
 						</div>
 						<div class="form-group">
 							<label for="imagen" class="imagen">Subir avatar:</label> <input

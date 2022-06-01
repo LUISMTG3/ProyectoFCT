@@ -180,7 +180,7 @@ dialog::backdrop {
 							<div class="form-group">
 								<label for="nombre" class="nombre">Nombre de Usuario</label> <input
 									type="text" class="form-control" id="nombre"
-									aria-describedby="emailHelp" th:field="*{nombre}"
+									aria-describedby="emailHelp" maxlength="30" th:field="*{nombre}"
 									required="required">
 
 							</div>
@@ -189,7 +189,7 @@ dialog::backdrop {
 
 								<label for="password" class="password">Password</label> <input
 									type="password" class="form-control" id="password"
-									th:field="*{password}" required="required">
+									th:field="*{password}" maxlength="20" required="required">
 
 							</div>
 
